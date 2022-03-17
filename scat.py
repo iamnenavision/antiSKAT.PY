@@ -341,7 +341,8 @@ def comma_to_full(text):
         if "," in text[i] and not "(" in text[i] and not "{" in text[i] and not "[" in text[i] and not "<" in text[i]: #kostyl
             for j in types:
                 if j in text[i].split()[0]:
-                    text[i]=text[i].replace(",","; /n    "+j+" ")
+                    text[i]=text[i].replace(", ","; \n    "+j+" ")
+                    text[i]=text[i].replace(",","; \n    "+j+" ")
     text_l=text
     text=""
     for i in text_l:
