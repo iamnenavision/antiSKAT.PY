@@ -1,7 +1,7 @@
 import re
 import sys #for removing comments
 import os
-
+import random
 
 #=====system_settings============================
 types=["wchar_t", "vector<vector<int>>", "vector<int>","unsigned char","signed char","unsigned int","char", "signed int", "short int","unsigned short","signed short","unsigned long long","long long",
@@ -21,6 +21,9 @@ syntax_symbs=space+closed_brackets+open_brackets_for_clearing_spaces+other_synta
 delete_cout_tie_on=1 #delete cout.tie(0);
 remove_comments_on=1 #remove all the comms
 delete_empty_lines_on=1 #remove empty lines.                                              || some functions leaves empty lines so it'll be better not to turn off this
+random_endl_on=1
+
+
 
 
 #==90% working:
@@ -34,9 +37,16 @@ remove_not_used_funcs_on=1 #remove useless vars and funcs from code             
 remove_not_used_defines_on=1 # remove_not_used_defines
 semicolon_endl_on=1 # ; -> ;\n
 comma_to_full_on=1 # long long i,c -> long long i long long c
+
+
+
 #==CAN CAUSE ERRORS:
 ANTI_1e6_to_1000000_on=1 #replace 1e6 1e7 etc                                             || RECOMMENDED TO AVOID ERRORS with const_to_define and const_to_code functions / can theoretically cause errors
 bad_codestyle_on=1 #" {"->" \n{"  , "..; ...;" to "...;\n ...;"                || can theoretically cause errors. recommended if using remove_not_used_funcs. not recommended if there are strings with "...;..." in program.
+change_var_names_on=1 #TODO
+
+
+
 #==TROLLING:
 one_line_program_on=0 # 2-liner from program.                                             || replace all libs to bitsstd
 #================================================
@@ -46,11 +56,9 @@ one_line_program_on=0 # 2-liner from program.                                   
 
 
 #TODO:
-#change var names
-#long long n, m, k;
-#SCAT-UVAGA!
-#defines v nachale etoy progu 
-#WHY DELLING
+#change var names!
+#SKAT-UVAGA!
+#typedef to define 
 
 #==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
@@ -287,7 +295,6 @@ def remove_not_used_funcs(text):
 
 #clearing var before deleting from code
 def var_to_clear(var):
-    #print(var)
     if ("(" in var and ")" in var and not "()" in var ) or "," in var:
         return ""
     else:
@@ -300,6 +307,12 @@ def var_to_clear(var):
 def check_vars_and_funcs(text,var,line_to_replace):
     if text.find(var)==text.rfind(var) and var!="main" and not "main" in line_to_replace:
         text=text.replace(line_to_replace,"")
+    elif change_var_names_on:
+        text=change_var_names(text,var)
+    return text
+
+def change_var_names(text,var):
+    #TODO?
     return text
 #==========
 
@@ -348,8 +361,31 @@ def comma_to_full(text):
     for i in text_l:
         text+=i+"\n"
     return(text)
+#==========
+
 
 #==========
+def random_endl(text):
+    text=text.split("\n")
+    i=0
+    while i!=len(text):
+        z=random.randint(0,100)
+        addd=0
+        if z>100 -2:
+            addd=3
+        elif z>100-2 -5:
+            addd=2
+        elif z>100-2-5 -23:
+            addd=1
+        text[i]+="\n    "*addd
+        i+=1
+    text_l=text
+    text=""
+    for i in text_l:
+        text+=i+"\n"
+    return text
+#==========
+
 
 with open("input.txt", "r") as f:
     text=f.read()
@@ -416,14 +452,16 @@ with open("input.txt", "r") as f:
     if remove_not_used_funcs_on:
         text=remove_not_used_funcs(text)
 
-    #LEAVE THAT LAST-1
+    #LEAVE THAT LAST-2
     if one_line_program_on:
         text=one_line_program(text)
         
-    #IMPORTANT: LEAVE THAT LAST
+    #IMPORTANT: LEAVE THAT LAST-1
     if delete_empty_lines_on:
         text=delete_empty_lines(text)
-        
+    #IMPORTANT: LEAVE THAT LAST
+    if random_endl_on:
+        text=random_endl(text)
     
                     
 print(text)
