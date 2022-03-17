@@ -4,6 +4,7 @@ import os
 import random
 
 #=====system_settings============================
+vowel="aeiouy"
 types=["wchar_t", "vector<vector<int>>", "vector<int>","unsigned char","signed char","unsigned int","char", "signed int", "short int","unsigned short","signed short","unsigned long long","long long",
        "float","long double","double","bool","void","int32_t","int64_t","long","int","short"]
 loop_names=["for","while", "else", "elif", "if", "case"]
@@ -12,7 +13,7 @@ open_brackets_for_clearing_spaces="(["
 closed_brackets = ")]}"
 closed_brackets_for_clearing_spaces=")]"
 space = " "
-other_syntax_symbs=";\n\t,<>+=-:"
+other_syntax_symbs=";\n\t,<>+=-:.*/!%"
 syntax_symbs=space+closed_brackets+open_brackets_for_clearing_spaces+other_syntax_symbs
 #================================================
 
@@ -311,8 +312,38 @@ def check_vars_and_funcs(text,var,line_to_replace):
         text=change_var_names(text,var)
     return text
 
+def var_exists(text,var):
+    for i in syntax_symbs:
+        for j in syntax_symbs:
+            if text.find(i+var+j)!=-1:
+                return 1
+    return 0
+
+def generate_random_name(text):
+    random_string=""
+    for _ in range(1,random.randint(3,6)):
+        # Considering only upper and lowercase letters
+        random_integer=97
+        while str(chr(random_integer)) in vowel:
+            random_integer = random.randint(97, 97 + 26 - 1)
+        # Convert to lowercase if the flip bit is on
+        random_integer = random_integer
+        # Keep appending random characters using chr(x)
+        random_string += (chr(random_integer))
+    #random_string=random_string.title()
+    if var_exists(text,random_string):
+        return generate_random_name(text)
+    else:
+        return random_string
+        
 def change_var_names(text,var):
-    #TODO?
+    if "main" in var:
+        return text
+    random_name=generate_random_name(text)
+    #print(random_name)
+    for i in syntax_symbs:
+        for j in syntax_symbs:
+            text=text.replace(i+var+j,i+random_name+j)
     return text
 #==========
 
