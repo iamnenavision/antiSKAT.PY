@@ -18,34 +18,29 @@ syntax_symbs=space+closed_brackets+open_brackets_for_clearing_spaces+other_synta
 #================================================
 
 #=====settings===================================
-#==100% working, cant cause errors:
 delete_cout_tie_on=1 #delete cout.tie(0);
 remove_comments_on=1 #remove all the comms
-delete_empty_lines_on=1 #remove empty lines.                                              || some functions leaves empty lines so it'll be better not to turn off this
-random_endl_on=1
-
-
-
-
-#==90% working:
+delete_empty_lines_on=1 #remove empty lines.                                              || HIGHLY RECOMMENDED. some functions leaves empty lines so it'll be better not to turn off this
+random_endl_on=1 # add random \n's
 clear_defines_on=1 #clear #DEFINES from the code
 replace_libs_to_bitsstd_on=1 #replace all libraries with BITS/STDC++.H
 return0_check_on=1 #add return 0; if there aren't "return 0;" in code                     || dont add return 0 if there are strings or functions with "return 0;"
 add_fast_input_on=1 #add fast input if there aren't
 const_to_define_on=0 #replace const by define                                             || can theoretically cause errors
+#   OR
 const_to_code_on=1 #const into code                                                       || can theoretically cause errors
-remove_not_used_funcs_on=1 #remove useless vars and funcs from code                       || can theoretically cause errors    
-remove_not_used_defines_on=1 # remove_not_used_defines
 semicolon_endl_on=1 # ; -> ;\n
 comma_to_full_on=1 # long long i,c -> long long i long long c
-
-
-
-#==CAN CAUSE ERRORS:
+remove_not_used_funcs_on=1 #remove useless vars and funcs from code                       || WARNING! cause 70% errors  
+remove_not_used_defines_on=1 # remove_not_used_defines                                    || can theoretically cause errors
 ANTI_1e6_to_1000000_on=1 #replace 1e6 1e7 etc                                             || RECOMMENDED TO AVOID ERRORS with const_to_define and const_to_code functions / can theoretically cause errors
-bad_codestyle_on=1 #" {"->" \n{"  , "..; ...;" to "...;\n ...;"                || can theoretically cause errors. recommended if using remove_not_used_funcs. not recommended if there are strings with "...;..." in program.
-change_var_names_on=1 #TODO
+bad_codestyle_on=1 #" {"->" \n{"  , "..; ...;" to "...;\n ...;"                           || can theoretically cause errors. recommended if using remove_not_used_funcs. not recommended if there are strings with "...;..." in program.
 
+#=====CHANGE VAR NAMES SETTINGS:===================
+change_var_names_on=1 #change_var_names on random
+generate_only_not_vowels_on=1 #generate only soglasnie(not vowels)                        || use to avoid some errors this func
+generate_first_letter_uppercase_on=0 #generate 1st char uppercase                         || use to avoid all errors this func. NOT RECOMMENDED
+bad_generator_on=0 # NOT RECOMMENDED. reinsurance when searching for existing variables.  || worsens the generation of variables, but avoids errors.
 
 
 #==TROLLING:
@@ -57,9 +52,9 @@ one_line_program_on=0 # 2-liner from program.                                   
 
 
 #TODO:
-#change var names!
-#SKAT-UVAGA!
 #typedef to define 
+
+
 
 #==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
@@ -317,21 +312,24 @@ def var_exists(text,var):
         for j in syntax_symbs:
             if text.find(i+var+j)!=-1:
                 return 1
+            if bad_generator_on:
+                if text.find(var)!=-1:
+                    return 1
     return 0
 
 def generate_random_name(text):
     random_string=""
-    for _ in range(1,random.randint(3,6)):
-        # Considering only upper and lowercase letters
-        random_integer=97
-        while str(chr(random_integer)) in vowel:
-            random_integer = random.randint(97, 97 + 26 - 1)
-        # Convert to lowercase if the flip bit is on
+    for _ in range(1,random.randint(2,6)):
+        random_integer = random.randint(97, 97 + 26 - 1)
+        while str(chr(random_integer)) in vowel and not generate_only_not_vowels_on:
+            random_integer = random.randint(97, 97 + 26 - 1) # Considering only upper and lowercase letters
         random_integer = random_integer
-        # Keep appending random characters using chr(x)
         random_string += (chr(random_integer))
-    #random_string=random_string.title()
+        
+    if generate_first_letter_uppercase_on:
+        random_string=random_string.title() #use if you wants 100% no errors this func
     if var_exists(text,random_string):
+        #print(random_string," exists!")
         return generate_random_name(text)
     else:
         return random_string
@@ -340,7 +338,6 @@ def change_var_names(text,var):
     if "main" in var:
         return text
     random_name=generate_random_name(text)
-    #print(random_name)
     for i in syntax_symbs:
         for j in syntax_symbs:
             text=text.replace(i+var+j,i+random_name+j)
