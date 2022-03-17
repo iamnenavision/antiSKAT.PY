@@ -37,7 +37,7 @@ ANTI_1e6_to_1000000_on=1 #replace 1e6 1e7 etc                                   
 bad_codestyle_on=1 #" {"->" \n{"  , "..; ...;" to "...;\n ...;"                           || can theoretically cause errors. recommended if using remove_not_used_funcs. not recommended if there are strings with "...;..." in program.
 
 #=====CHANGE VAR NAMES SETTINGS:===================
-change_var_names_on=1 #change_var_names on random
+change_var_names_on=0 #change_var_names on random
 generate_only_not_vowels_on=1 #generate only soglasnie(not vowels)                        || use to avoid some errors this func
 generate_first_letter_uppercase_on=0 #generate 1st char uppercase                         || use to avoid all errors this func. NOT RECOMMENDED
 bad_generator_on=0 # NOT RECOMMENDED. reinsurance when searching for existing variables.  || worsens the generation of variables, but avoids errors.
@@ -53,7 +53,7 @@ one_line_program_on=0 # 2-liner from program.                                   
 
 #TODO:
 #typedef to define 
-
+#udalenie funkcii udalyaet ih ne celikom, a tolko zagolovok////////
 
 
 #==========COMMENT REMOVER FUNCTIONS
@@ -252,7 +252,7 @@ def const_to_define(text):
 #==========
 
 
-#==========REMOVE UNUSED VARS AND FUNCS
+#==========REMOVE UNUSED VARS AND FUNCS AND change_var_names
 def remove_not_used_funcs(text):
     for line in text.split('\n'):
         for i in types:
@@ -327,9 +327,8 @@ def generate_random_name(text):
         random_string += (chr(random_integer))
         
     if generate_first_letter_uppercase_on:
-        random_string=random_string.title() #use if you wants 100% no errors this func
+        random_string=random_string.title()
     if var_exists(text,random_string):
-        #print(random_string," exists!")
         return generate_random_name(text)
     else:
         return random_string
@@ -346,7 +345,6 @@ def change_var_names(text,var):
 
 #==========
 def remove_not_used_defines(text):
-    #WARNING ''
     for line in text.split("\n"):
         if "#define" in line.lower():
             line_splited=clever_split(line)
