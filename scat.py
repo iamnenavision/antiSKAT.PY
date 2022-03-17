@@ -32,6 +32,8 @@ const_to_define_on=0 #replace const by define                                   
 const_to_code_on=1 #const into code                                                       || can theoretically cause errors
 remove_not_used_funcs_on=1 #remove useless vars and funcs from code                       || can theoretically cause errors    
 remove_not_used_defines_on=1 # remove_not_used_defines
+semicolon_endl_on=1 # ; -> ;\n
+comma_to_full_on=1 # long long i,c -> long long i long long c
 #==CAN CAUSE ERRORS:
 ANTI_1e6_to_1000000_on=1 #replace 1e6 1e7 etc                                             || RECOMMENDED TO AVOID ERRORS with const_to_define and const_to_code functions / can theoretically cause errors
 bad_codestyle_on=1 #" {"->" \n{"  , "..; ...;" to "...;\n ...;"                || can theoretically cause errors. recommended if using remove_not_used_funcs. not recommended if there are strings with "...;..." in program.
@@ -48,6 +50,7 @@ one_line_program_on=0 # 2-liner from program.                                   
 #long long n, m, k;
 #SCAT-UVAGA!
 #defines v nachale etoy progu 
+#WHY DELLING
 
 #==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
@@ -284,6 +287,7 @@ def remove_not_used_funcs(text):
 
 #clearing var before deleting from code
 def var_to_clear(var):
+    #print(var)
     if ("(" in var and ")" in var and not "()" in var ) or "," in var:
         return ""
     else:
@@ -301,6 +305,7 @@ def check_vars_and_funcs(text,var,line_to_replace):
 
 #==========
 def remove_not_used_defines(text):
+    #WARNING ''
     for line in text.split("\n"):
         if "#define" in line.lower():
             line_splited=clever_split(line)
@@ -316,19 +321,61 @@ def remove_not_used_defines(text):
 #==========
 
 
+#==========; -> ;\n
+def semicolon_endl(text):
+    text=text.split("\n")
+    for i in range(1,len(text)):
+        if not "define" in text[i]:
+            text[i]=text[i].replace(";",";\n    ")
+    text_l=text
+    text=""
+    for i in text_l:
+        text+=i+"\n"
+    return text
+#==========
 
-def skat(text):
+#========== long long i,c -> long long i long long c
+def comma_to_full(text):
+    text=text.split("\n")
+    for i in range(1,len(text)):
+        if "," in text[i] and not "(" in text[i] and not "{" in text[i] and not "[" in text[i] and not "<" in text[i]: #kostyl
+            for j in types:
+                if j in text[i].split()[0]:
+                    text[i]=text[i].replace(",","; "+j+" ")
+    text_l=text
+    text=""
+    for i in text_l:
+        text+=i+"\n"
+    return(text)
+
+#==========
+
+with open("input.txt", "r") as f:
+    text=f.read()
 
     
     text=text.replace("typedef long long ll;","#define ll long long")
     text=text.replace("typedef long double ld;","#define ld long double")
+    text=text.replace(" (","(")
+    text=text.replace("("," (")
+    text=text.replace(", ",",")
+    text=text.replace(",",", ")
 
     
     #experimental part that theoretically can help avoid some errors
     text=text.replace(";\n","; \n")
     
+
+    
+    #LEAVE #1
     if remove_comments_on:
-       text=commentRemover(text)
+        text=commentRemover(text)
+
+    if semicolon_endl_on:
+        text=semicolon_endl(text)
+
+    if comma_to_full_on:
+        text=comma_to_full(text)
 
     if ANTI_1e6_to_1000000_on:
        text=ANTI_1e6_to_1000000(text)
@@ -375,7 +422,9 @@ def skat(text):
     #IMPORTANT: LEAVE THAT LAST
     if delete_empty_lines_on:
         text=delete_empty_lines(text)
-
-    return text
+        
+    
+                    
+print(text)
 
 
