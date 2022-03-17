@@ -280,9 +280,11 @@ def remove_not_used_funcs(text):
                             if line_splited[j]!="":
                                 text=check_vars_and_funcs(text,line_splited[j],line)#its 2nd one
     return text
-#clear before deleting
+
+
+#clearing var before deleting from code
 def var_to_clear(var):
-    if "(" in var and ")" not in var:
+    if ("(" in var and ")" in var and not "()" in var ) or "," in var:
         return ""
     else:
         for i in syntax_symbs:
@@ -294,7 +296,6 @@ def var_to_clear(var):
 def check_vars_and_funcs(text,var,line_to_replace):
     if text.find(var)==text.rfind(var) and var!="main" and not "main" in line_to_replace:
         text=text.replace(line_to_replace,"")
-        print(line_to_replace,var)
     return text
 #==========
 
