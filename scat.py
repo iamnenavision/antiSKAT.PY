@@ -1,12 +1,10 @@
 import re
-import sys
-import os
 import random
 
-#=====system_settings============================
+##=====system_settings============================
 vowel="aeiouy"
 types=["wchar_t", "vector<vector<int>>", "vector<int>","unsigned char","signed char","unsigned int","char", "signed int", "short int","unsigned short","signed short","unsigned long long","long long",
-       "float","long double","double","bool","void","int32_t","int64_t","long","int","short"]
+       "float","long double","double","bool","void","int32_t","int64_t","long","int","short","string"]
 loop_names=["for","while", "else", "elif", "if", "case"]
 open_brackets = "([{"
 open_brackets_for_clearing_spaces="(["
@@ -21,7 +19,7 @@ syntax_symbs=space+closed_brackets+open_brackets_for_clearing_spaces+other_synta
 delete_cout_tie_on=1 #delete cout.tie(0);
 remove_comments_on=1 #remove all the comms
 delete_empty_lines_on=1 #remove empty lines.                                              || HIGHLY RECOMMENDED. some functions leaves empty lines so it'll be better not to turn off this
-random_endl_on=1 # add random \n's
+random_endlines_on=1 # add random \n's
 clear_defines_on=1 #clear #DEFINES from the code
 replace_libs_to_bitsstd_on=1 #replace all libraries with BITS/STDC++.H
 return0_check_on=1 #add return 0; if there aren't "return 0;" in code                     || dont add return 0 if there are strings or functions with "return 0;"
@@ -35,13 +33,13 @@ remove_not_used_funcs_on=1 #remove useless vars and funcs from code             
 remove_not_used_defines_on=1 # remove_not_used_defines                                    || can theoretically cause errors
 ANTI_1e6_to_1000000_on=1 #replace 1e6 1e7 etc                                             || RECOMMENDED TO AVOID ERRORS with const_to_define and const_to_code functions / can theoretically cause errors
 bad_codestyle_on=1 #" {"->" \n{"  , "..; ...;" to "...;\n ...;"                           || can theoretically cause errors. recommended if using remove_not_used_funcs. not recommended if there are strings with "...;..." in program.
-
+using_to_define_on=1 
 #=====CHANGE VAR NAMES SETTINGS:===================
 change_var_names_on=1 #change_var_names on random
 generate_only_not_vowels_on=1 #generate only soglasnie(not vowels)                        || use to avoid some errors this func
 generate_first_letter_uppercase_on=0 #generate 1st char uppercase                         || use to avoid all errors this func. NOT RECOMMENDED
 bad_generator_on=0 # NOT RECOMMENDED. reinsurance when searching for existing variables.  || worsens the generation of variables, but avoids errors.
-random_name_length=[2,6]
+random_name_length=[2,7]
 
 #==TROLLING:
 one_line_program_on=0 # 2-liner from program.                                             || replace all libs to bitsstd
@@ -52,8 +50,7 @@ one_line_program_on=0 # 2-liner from program.                                   
 
 
 #TODO:
-#typedef to define?
-
+#typedef to define 
 
 #==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
@@ -108,7 +105,7 @@ def commentRemover(text):
     def replacer(match):
         s = match.group(0)
         if s.startswith('/'):
-            return " "
+            return " " # note: a space and not an empty string
         else:
             return s
     pattern = re.compile(
@@ -125,6 +122,7 @@ def clear_spaces_after_comma(text):
     return text.replace(", ",",")
 
 def clever_split(line):
+    #line=clear_spaces_after_comma(line)
     line=line.replace(" (","(")
     line=line.split()
     for i in range(3,len(line)):
@@ -245,15 +243,23 @@ def const_plus_to_space(text):
                 list_text[i]=list_text[i].replace("="," ")
                 list_text[i]=list_text[i].replace(";","")
     text=""
-    for i in range(1,len(list_text)):
+    for i in range(0,len(list_text)):
         text+=list_text[i]+"\n"
     return text
 
 
 
 def const_to_define(text):
-    for i in types:
-        text=text.replace("const "+i,"#define")
+    text=text.split("\n")
+    for i in range(0,len(text)):
+        if len(text[i].split())>0:
+            if "const" in text[i].split()[0]:
+                for j in types:
+                    text[i]=text[i].replace("const "+j,"#define")
+    text_l=text
+    text=""
+    for i in text_l:
+        text+=i+"\n"
     return text
 #==========
 
@@ -272,7 +278,7 @@ def remove_not_used_funcs(text):
                     gone=1
                 elif line_splited[0]==i:
                     j=1
-                    gone=1;
+                    gone=1
                 if gone!=1:
                     while j<len(line_splited) and line_splited[j]!=i and line_splited[j-2]+line_splited[j-1]+line_splited[j]!=i and line_splited[j-1]+line_splited[j]!=i:
                         j+=1
@@ -307,13 +313,12 @@ def var_to_clear(var):
 
 
 def check_vars_and_funcs(text,var,line_to_replace):
-    #print(var)
+
     if text.find(var)==text.rfind(var) and var!="main" and not "main" in line_to_replace:
         if var+"(" in line_to_replace.replace(" ",""):
             
             text=delete_function(text,var,line_to_replace)
         else:
-            #print(var)
             text=text.replace(line_to_replace,"")
     elif change_var_names_on:
         text=change_var_names(text,var)
@@ -348,6 +353,7 @@ def delete_function(text,var,line_to_replace):
     text=""
     for i in range(0,len(temp)):
         text+=temp[i]+"\n"
+    #print(text)
     return text
 
 
@@ -468,6 +474,25 @@ def text_space_before_bracket(text):
     return text
 #==========
 
+#==========
+def using_to_define(text):
+    text=text.split("\n")
+    for i in range(0,len(text)):
+        if "using" in text[i] and "=" in text[i]:
+            text[i]=text[i].replace("using","#define")
+            text[i]=text[i].replace(" = "," ")
+            text[i]=text[i].replace(" ="," ")
+            text[i]=text[i].replace("= "," ")
+            text[i]=text[i].replace("="," ")
+    
+    text_l=text
+    text=""
+    for i in text_l:
+        text+=i+"\n"
+    return text
+#==========
+
+
 
 
 with open("input.txt", "r") as f:
@@ -476,41 +501,51 @@ with open("input.txt", "r") as f:
     #experimental part that theoretically can help avoid some errors
     text=text.replace("typedef long long ll;","#define ll long long")
     text=text.replace("typedef long double ld;","#define ld long double")
+
+    
     text=text_space_before_bracket(text)
-    text=text.replace(", ",",")
-    text=text.replace(",",", ")
-    text=text.replace(";\n","; \n")
 
 
     
+    text=text.replace(", ",",")
+    text=text.replace(",",", ")
+    text=text.replace(";\n","; \n")
+    #text=text.replace(" ( ","( ")
+    #text=text.replace(" (","( ")
+
+    
+    #LEAVE #1
     if remove_comments_on:
         text=commentRemover(text)
 
     if semicolon_endl_on:
         text=semicolon_endl(text)
-
+    if using_to_define_on:
+        text=using_to_define(text)
     if comma_to_full_on:
         text=comma_to_full(text)
 
     if ANTI_1e6_to_1000000_on:
        text=ANTI_1e6_to_1000000(text)
-    
+
     if clear_defines_on:
+        #text=text.replace("\n{","{")
         text=clear_defines(text)
         
     
     if const_to_define_on:
         text=const_plus_to_space(text)
         text=const_to_define(text)
-
+ 
     if remove_not_used_defines_on:
         text=remove_not_used_defines(text)
-
+ 
     if const_to_code_on:
         text=const_plus_to_space(text)
         text=const_to_define(text)
+        print(text)  
         text=clear_defines(text)
-        
+   
     if replace_libs_to_bitsstd_on:
         text=replace_libs_to_bitsstd(text)
 
@@ -535,10 +570,10 @@ with open("input.txt", "r") as f:
     if delete_empty_lines_on:
         text=delete_empty_lines(text)
     #IMPORTANT: LEAVE THAT LAST-1
-    if random_endl_on:
+    if random_endlines_on:
         text=random_endl(text)
 
-    #LEAVE THAT LAST
+        #LEAVE THAT LAST
     if one_line_program_on:
         text=one_line_program(text)
     
