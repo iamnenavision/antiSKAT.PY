@@ -52,8 +52,7 @@ one_line_program_on=0 # 2-liner from program.                                   
 
 
 #TODO:
-#typedef to define 
-#udalenie funkcii udalyaet ih ne celikom, a tolko zagolovok////////
+#typedef to define?
 
 
 #==========COMMENT REMOVER FUNCTIONS
