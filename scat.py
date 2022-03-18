@@ -37,14 +37,14 @@ ANTI_1e6_to_1000000_on=1 #replace 1e6 1e7 etc                                   
 bad_codestyle_on=1 #" {"->" \n{"  , "..; ...;" to "...;\n ...;"                           || can theoretically cause errors. recommended if using remove_not_used_funcs. not recommended if there are strings with "...;..." in program.
 
 #=====CHANGE VAR NAMES SETTINGS:===================
-change_var_names_on=0 #change_var_names on random
+change_var_names_on=1 #change_var_names on random
 generate_only_not_vowels_on=1 #generate only soglasnie(not vowels)                        || use to avoid some errors this func
 generate_first_letter_uppercase_on=0 #generate 1st char uppercase                         || use to avoid all errors this func. NOT RECOMMENDED
 bad_generator_on=0 # NOT RECOMMENDED. reinsurance when searching for existing variables.  || worsens the generation of variables, but avoids errors.
-
+random_name_length=[100,100]
 
 #==TROLLING:
-one_line_program_on=0 # 2-liner from program.                                             || replace all libs to bitsstd
+one_line_program_on=1 # 2-liner from program.                                             || replace all libs to bitsstd
 #================================================
 
 
@@ -127,6 +127,7 @@ def clear_spaces_after_comma(text):
 
 def clever_split(line):
     #line=clear_spaces_after_comma(line)
+    line=line.replace(" (","(")
     line=line.split()
     for i in range(3,len(line)):
         line[2]+=" "+line[3]
@@ -138,13 +139,13 @@ def clear_defines(text):
         line=text.split('\n')[line]
         if "#define" in line:
             splited_line=clever_split(line)
+            #print(splited_line)
             if "(" in splited_line[1] and ")" in splited_line[1] and not "()" in splited_line[1]:
                 continue
             text=text.replace(line,"")
             for i in range(0,len(syntax_symbs)):
                 for j in range(0,len(syntax_symbs)):
-                    #if syntax_symbs[i]==" " and syntax_symbs[j]=="(":
-                        #print()
+                    
                     text=text.replace(syntax_symbs[i]+splited_line[1]+syntax_symbs[j],syntax_symbs[i]+splited_line[2]+syntax_symbs[j])
     return text
 #==========       
@@ -201,9 +202,16 @@ def delete_multiple_spaces(text):
     return re.sub(' +', ' ',text)
 
 def one_line_program(text):
-    text=replace_libs_to_bitsstd(text)
-    text=text.replace("\n", " ")
-    text=text.replace("#include <bits/stdc++.h>", "#include <bits/stdc++.h>\n")
+    text=text.split("\n")
+    text_l=text
+    text=""
+    for i in text_l:
+        if "#define" in i or "#include" in i:
+            text+="\n"+i+"\n"
+        else:
+            text+=i+" "
+
+    
     text=delete_multiple_spaces(text)
     text=text.replace("\n ","\n")
     return text
@@ -301,10 +309,13 @@ def var_to_clear(var):
 
 
 def check_vars_and_funcs(text,var,line_to_replace):
+    #print(var)
     if text.find(var)==text.rfind(var) and var!="main" and not "main" in line_to_replace:
         if var+"(" in line_to_replace.replace(" ",""):
+            
             text=delete_function(text,var,line_to_replace)
         else:
+            #print(var)
             text=text.replace(line_to_replace,"")
     elif change_var_names_on:
         text=change_var_names(text,var)
@@ -357,7 +368,7 @@ def var_exists(text,var):
 
 def generate_random_name(text):
     random_string=""
-    for _ in range(1,random.randint(2,6)):
+    for _ in range(1,random.randint(random_name_length[0],random_name_length[1])):
         random_integer = random.randint(97, 97 + 26 - 1)
         while str(chr(random_integer)) in vowel and not generate_only_not_vowels_on:
             random_integer = random.randint(97, 97 + 26 - 1) # Considering only upper and lowercase letters
@@ -447,6 +458,21 @@ def random_endl(text):
     return text
 #==========
 
+#==========
+def text_space_before_bracket(text):
+    text=text.split("\n")
+    for i in range(1,len(text)):
+        if not "define" in text[i]:
+            text[i]=text[i].replace(" (","(")
+            text[i]=text[i].replace("("," (")
+    text_l=text
+    text=""
+    for i in text_l:
+        text+=i+"\n"
+    return text
+#==========
+
+
 
 with open("input.txt", "r") as f:
     text=f.read()
@@ -454,12 +480,17 @@ with open("input.txt", "r") as f:
     #experimental part that theoretically can help avoid some errors
     text=text.replace("typedef long long ll;","#define ll long long")
     text=text.replace("typedef long double ld;","#define ld long double")
-    text=text.replace(" (","(")
-    text=text.replace("("," (")
+
+    
+    text=text_space_before_bracket(text)
+
+
+    
     text=text.replace(", ",",")
     text=text.replace(",",", ")
     text=text.replace(";\n","; \n")
-    
+    #text=text.replace(" ( ","( ")
+    #text=text.replace(" (","( ")
 
     
     #LEAVE #1
@@ -476,6 +507,7 @@ with open("input.txt", "r") as f:
        text=ANTI_1e6_to_1000000(text)
     
     if clear_defines_on:
+        #text=text.replace("\n{","{")
         text=clear_defines(text)
         
     
@@ -510,16 +542,17 @@ with open("input.txt", "r") as f:
     if remove_not_used_funcs_on:
         text=remove_not_used_funcs(text)
 
-    #LEAVE THAT LAST-2
-    if one_line_program_on:
-        text=one_line_program(text)
         
-    #IMPORTANT: LEAVE THAT LAST-1
+    #IMPORTANT: LEAVE THAT LAST-2
     if delete_empty_lines_on:
         text=delete_empty_lines(text)
-    #IMPORTANT: LEAVE THAT LAST
+    #IMPORTANT: LEAVE THAT LAST-1
     if random_endl_on:
         text=random_endl(text)
+
+        #LEAVE THAT LAST
+    if one_line_program_on:
+        text=one_line_program(text)
     
                     
 print(text)
