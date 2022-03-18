@@ -302,10 +302,48 @@ def var_to_clear(var):
 
 def check_vars_and_funcs(text,var,line_to_replace):
     if text.find(var)==text.rfind(var) and var!="main" and not "main" in line_to_replace:
-        text=text.replace(line_to_replace,"")
+        if var+"(" in line_to_replace.replace(" ",""):
+            text=delete_function(text,var,line_to_replace)
+        else:
+            text=text.replace(line_to_replace,"")
     elif change_var_names_on:
         text=change_var_names(text,var)
     return text
+
+def delete_function(text,var,line_to_replace):
+    #print(var,text)
+    text=text.split("\n")
+    n=-1
+    open_brackets_counter=0
+    for i in range(0,len(text)):
+        if line_to_replace in text[i] and n==-1:
+            for j in text[i]:
+                if j=="{":
+                    open_brackets_counter+=1
+                elif j=="}":
+                    open_brackets_counter-=1
+            n=i
+            text[i]=""
+        elif n!=-1:
+            for j in text[i]:
+                if j=="{":
+                    open_brackets_counter+=1
+                elif j=="}":
+                    open_brackets_counter-=1
+            if open_brackets_counter>0:
+                text[i]=""
+            else:
+                text[i]=""
+                break
+    
+    temp=text
+    text=""
+    for i in range(0,len(temp)):
+        text+=temp[i]+"\n"
+    #print(text)
+    return text
+
+
 
 def var_exists(text,var):
     for i in syntax_symbs:
@@ -389,21 +427,18 @@ def comma_to_full(text):
     return(text)
 #==========
 
-
 #==========
 def random_endl(text):
     text=text.split("\n")
     i=0
     while i!=len(text):
-        z=random.randint(0,100)
-        addd=0
-        if z>100 -2:
-            addd=3
-        elif z>100-2 -5:
-            addd=2
-        elif z>100-2-5 -23:
-            addd=1
-        text[i]+="\n    "*addd
+        rnd=random.randint(0,100)
+        if rnd<3:
+            text[i]+="\n    "*3
+        elif rnd<9:
+            text[i]+="\n    "*2
+        elif rnd<40:
+            text[i]+="\n    "
         i+=1
     text_l=text
     text=""
@@ -416,16 +451,13 @@ def random_endl(text):
 with open("input.txt", "r") as f:
     text=f.read()
 
-    
+    #experimental part that theoretically can help avoid some errors
     text=text.replace("typedef long long ll;","#define ll long long")
     text=text.replace("typedef long double ld;","#define ld long double")
     text=text.replace(" (","(")
     text=text.replace("("," (")
     text=text.replace(", ",",")
     text=text.replace(",",", ")
-
-    
-    #experimental part that theoretically can help avoid some errors
     text=text.replace(";\n","; \n")
     
 
