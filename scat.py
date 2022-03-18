@@ -41,10 +41,10 @@ change_var_names_on=1 #change_var_names on random
 generate_only_not_vowels_on=1 #generate only soglasnie(not vowels)                        || use to avoid some errors this func
 generate_first_letter_uppercase_on=0 #generate 1st char uppercase                         || use to avoid all errors this func. NOT RECOMMENDED
 bad_generator_on=0 # NOT RECOMMENDED. reinsurance when searching for existing variables.  || worsens the generation of variables, but avoids errors.
-random_name_length=[100,100]
+random_name_length=[2,6]
 
 #==TROLLING:
-one_line_program_on=1 # 2-liner from program.                                             || replace all libs to bitsstd
+one_line_program_on=0 # 2-liner from program.                                             || replace all libs to bitsstd
 #================================================
 
 
