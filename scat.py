@@ -1,5 +1,5 @@
 import re
-import sys #for removing comments
+import sys
 import os
 import random
 
@@ -108,7 +108,7 @@ def commentRemover(text):
     def replacer(match):
         s = match.group(0)
         if s.startswith('/'):
-            return " " # note: a space and not an empty string
+            return " "
         else:
             return s
     pattern = re.compile(
@@ -125,7 +125,6 @@ def clear_spaces_after_comma(text):
     return text.replace(", ",",")
 
 def clever_split(line):
-    #line=clear_spaces_after_comma(line)
     line=line.replace(" (","(")
     line=line.split()
     for i in range(3,len(line)):
@@ -321,7 +320,6 @@ def check_vars_and_funcs(text,var,line_to_replace):
     return text
 
 def delete_function(text,var,line_to_replace):
-    #print(var,text)
     text=text.split("\n")
     n=-1
     open_brackets_counter=0
@@ -350,7 +348,6 @@ def delete_function(text,var,line_to_replace):
     text=""
     for i in range(0,len(temp)):
         text+=temp[i]+"\n"
-    #print(text)
     return text
 
 
@@ -479,20 +476,13 @@ with open("input.txt", "r") as f:
     #experimental part that theoretically can help avoid some errors
     text=text.replace("typedef long long ll;","#define ll long long")
     text=text.replace("typedef long double ld;","#define ld long double")
-
-    
     text=text_space_before_bracket(text)
-
-
-    
     text=text.replace(", ",",")
     text=text.replace(",",", ")
     text=text.replace(";\n","; \n")
-    #text=text.replace(" ( ","( ")
-    #text=text.replace(" (","( ")
+
 
     
-    #LEAVE #1
     if remove_comments_on:
         text=commentRemover(text)
 
@@ -506,7 +496,6 @@ with open("input.txt", "r") as f:
        text=ANTI_1e6_to_1000000(text)
     
     if clear_defines_on:
-        #text=text.replace("\n{","{")
         text=clear_defines(text)
         
     
@@ -549,7 +538,7 @@ with open("input.txt", "r") as f:
     if random_endl_on:
         text=random_endl(text)
 
-        #LEAVE THAT LAST
+    #LEAVE THAT LAST
     if one_line_program_on:
         text=one_line_program(text)
     
