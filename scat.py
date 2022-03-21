@@ -1,13 +1,15 @@
 import re
 import random
 
-##=====system_settings============================
+# =====system_settings============================
 vowel = "aeiouy"
-types = ["#define","wchar_t", "vector<vector<int>>", "vector<int>", "vector<long long>", "vector<char>", "vector<bool>",
+types = ["#define", "wchar_t", "vector<vector<int>>", "vector<int>", "vector<long long>", "vector<char>",
+         "vector<bool>",
          "vector<long>", "unsigned char", "signed char", "unsigned int", "char", "signed int", "short int",
          "unsigned short", "signed short", "unsigned long long", "long long",
          "float", "long double", "double", "bool", "void", "int32_t", "int64_t", "long", "int", "short", "string",
          "struct", "vector<", "set", "pair"]
+null_false_zeros = ["Null", "NULL", "False", "0", "null", "false", "FALSE", "fALSE"]
 loop_names = ["for", "while", "else", "elif", "if", "case"]
 open_brackets = "([{"
 open_brackets_for_clearing_spaces = "(["
@@ -19,35 +21,35 @@ syntax_symbs = space + closed_brackets + open_brackets + other_syntax_symbs
 # ================================================
 
 # =====settings===================================
-clear_spaces_on=1 # clear not needed " " and "\n"'s
-delete_cout_tie_on = 1  # delete cout.tie(0);
-remove_comments_on = 1  # remove all the comms
-delete_empty_lines_on = 1  # remove empty lines.                                              || HIGHLY RECOMMENDED. some functions leaves empty lines so it'll be better not to turn off this
-random_endlines_on = 1  # add random \n's
+clear_spaces_on = 1  # clear not needed " " and "\n"'s
+delete_cout_tie_on = 1  # Delete "cout.tie(0);"
+remove_comments_on = 1  # Remove all comments
+delete_empty_lines_on = 1  # Remove empty lines. HIGHLY RECOMMENDED coz some functions leaves empty lines.
+random_endlines_on = 1  # Add random end lines
 clear_defines_on = 1  # clear #DEFINES from the code
 replace_libs_to_bitsstd_on = 1  # replace all libraries with BITS/STDC++.H
-return0_check_on = 1  # add return 0; if there aren't "return 0;" in code                     || dont add return 0 if there are strings or functions with "return 0;"
+return0_check_on = 1  # add return 0; if there aren't
 add_fast_input_on = 1  # add fast input if there aren't
-const_to_define_on = 0  # replace const by define                                             || can theoretically cause errors
+const_to_define_on = 0  # replace const by define
 #   OR
-const_to_code_on = 1  # const into code                                                       || can theoretically cause errors
+const_to_code_on = 1  # const into code
 semicolon_endl_on = 1  # ; -> ;\n
 comma_to_full_on = 1  # long long i,c -> long long i long long c
-remove_not_used_funcs_on = 1  # remove useless vars and funcs from code                       || WARNING! cause 70% errors
-remove_not_used_defines_on = 1  # remove_not_used_defines                                    || can theoretically cause errors
-ANTI_1e6_to_1000000_on = 1  # replace 1e6 1e7 etc                                             || RECOMMENDED TO AVOID ERRORS with const_to_define and const_to_code functions / can theoretically cause errors
-bad_codestyle_on = 1  # " {"->" \n\{"  , "..; ...;" to "...;\n ...;"                           || can theoretically cause errors. recommended if using remove_not_used_funcs. not recommended if there are strings with "...;..." in program.
+remove_not_used_funcs_on = 1  # remove useless vars and funcs from code
+remove_not_used_defines_on = 1  # remove_not_used_defines
+ANTI_1e6_to_1000000_on = 1  # replace 1e6 1e7 etc
+bad_codestyle_on = 1  # " {"->" \n\{"  , "..; ...;" to "...;\n ...;"
 using_to_define_on = 1
 # =====CHANGE VAR NAMES SETTINGS:===================
 change_var_names_on = 1  # change_var_names on random
-generate_only_not_vowels_on = 1  # generate only soglasnie(not vowels)                        || use to avoid some errors this func
-generate_first_letter_uppercase_on = 0  # generate 1st char uppercase                         || use to avoid all errors this func. NOT RECOMMENDED
-bad_generator_on = 0  # NOT RECOMMENDED. reinsurance when searching for existing variables.  || worsens the generation of variables, but avoids errors.
+generate_only_not_vowels_on = 1  # not generate only vowels
+generate_first_letter_uppercase_on = 0  # generate 1st char uppercase
+bad_generator_on = 0  # NOT RECOMMENDED. reinsurance when searching for existing variables
 random_name_length = [1, 4]
 name_exceptions = []
 
 # ==TROLLING:
-one_line_program_on = 0  # 2-liner from program.                                             || replace all libs to bitsstd
+one_line_program_on = 0  # 2-liner from program
 
 
 # ================================================
@@ -56,9 +58,13 @@ one_line_program_on = 0  # 2-liner from program.                                
 # TODO:
 # typedef to define
 # proverka na solve()
-# norm proverka peremennyh
-# upgrade cout.tie(0);
+# norm proverka peremennyh - ?
+# upgrade cout.tie(0);!!!!!!
 # titov codestyle
+# rename defs PEP8
+# 2D TROLLING
+# CODED CODE
+# todo kak inache
 
 # ==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
@@ -148,7 +154,7 @@ def clear_defines(text):
         line = text.split('\n')[line]
         if "#define" in line:
             splited_line = clever_split(line)
-            if "(" in splited_line[1] and ")" in splited_line[1] and not "()" in splited_line[1]:
+            if "(" in splited_line[1] and ")" in splited_line[1] and "()" not in splited_line[1]:
                 continue
             text = text.replace(line, "")
             for i in range(0, len(syntax_symbs)):
@@ -186,7 +192,7 @@ def delete_empty_lines(text):
 
 # ==========ADD RETURN0 IF THERE ARENT
 def return0_check(text):
-    if not "return 0;" in text and not "return(0);" in text and not "return (0);" in text:
+    if "return 0;" not in text and "return(0);" not in text and "return (0);" not in text:
 
         text = text.split("\n")
         for i in range(len(text) - 1, 0, -1):
@@ -204,10 +210,16 @@ def return0_check(text):
 
 # ==========DELETE COUTTIE0 IF THERE ARE
 def delete_cout_tie(text):
+    # TODOfor i in null_false_zeros:
+    #    text = text.replace("ios::sync_with_stdio ("+i+");", "ios::sync_with_stdio (0); \n    cin.tie(0);")
+    #    text = text.replace("ios::sync_with_stdio("+i+");", "ios::sync_with_stdio (0); \n    cin.tie(0);")
     text = text.replace("cout.tie(0);", "")
     text = text.replace("cout.tie (0);", "")
     text = text.replace("cout.tie(False);", "")
     text = text.replace("cout.tie(false);", "")
+    text = text.replace("cout.tie(NULL);", "")
+    text = text.replace("cout.tie(null);", "")
+    text = text.replace("cout.tie(Null);", "")
     return text
 
 
@@ -215,11 +227,12 @@ def delete_cout_tie(text):
 
 # ==========ADD CINTIE
 def add_fast_input(text):
-    if not "ios::sync_with_stdio" in text and not "cin.tie" in text:
+    if "ios::sync_with_stdio" not in text and "cin.tie" not in text:
         text = text.replace("main() {", "main() {\n    ios::sync_with_stdio(0);\n    cin.tie(0);")
-    elif "ios::sync_with_stdio" in text and not "cin.tie" in text and not "cin. tie" in text:
-        text = text.replace("ios::sync_with_stdio (0);", "ios::sync_with_stdio (0); \n    cin.tie(0);")
-        text = text.replace("ios::sync_with_stdio(0);", "ios::sync_with_stdio (0); \n    cin.tie(0);")
+    elif "ios::sync_with_stdio" in text and "cin.tie" not in text and "cin. tie" not in text:
+        for i in null_false_zeros:
+            text = text.replace("ios::sync_with_stdio (" + i + ");", "ios::sync_with_stdio (0); \n    cin.tie(0);")
+            text = text.replace("ios::sync_with_stdio(" + i + ");", "ios::sync_with_stdio (0); \n    cin.tie(0);")
     return text
 
 
@@ -305,17 +318,16 @@ def const_to_define(text):
 
 # ==========REMOVE UNUSED VARS AND FUNCS AND change_var_names
 def remove_not_used_funcs(text):
-    #print(text)
+    # print(text)
     text = text
     text = text.replace("(", " ( ")
     text = text.replace(")", " ) ")
     text = text.replace(",", " , ")
     text = text.replace("&", " & ")
-    text=text.replace("\n  ","\n        ")
-    text=text.replace("\n    ","\n ")#TODO maybe bug
+    text = text.replace("\n  ", "\n        ")
+    text = text.replace("\n    ", "\n ")  # TODO maybe bug
     text = text.replace("  ", " ")
     for z in range(0, len(text.split('\n'))):
-        l = len(text.split('\n'))
         line = text.split('\n')[z].split()
         for i in range(0, len(line) - 1):
             if not (line[i] in types or "vector<" in line[i]):
@@ -325,30 +337,30 @@ def remove_not_used_funcs(text):
                 if line[i + 1] == "&" or "":
                     i += 1
                 if line[i + 1] not in types:
-                    flag=1# flag 1 can del, flag 0 only rename
+                    flag = 1  # flag 1 can del, flag 0 only rename
                     if line[i + 1][-1] == "(":  # func name
                         # print(line[i+1],"function, del ALLOWED")
                         flag = 1  # function, del ALLOWED
                     elif len(line) > i + 2:
-                        if line[i + 2][0] =="(":
+                        if line[i + 2][0] == "(":
                             flag = 1
                     else:
                         if "(" in line:
                             # print(line[i+1],"var, del DENIED")
                             flag = 0  # var, del DENIED
                         else:
-                                # print(line[i+1],"var, del ALLOWED")
+                            # print(line[i+1],"var, del ALLOWED")
                             flag = 1  # var, del ALLOWED
 
                     var = clear_var_name(line[i + 1])
-                    if var == "" or var in types: continue
+                    if var == "" or var in types:
+                        continue
                     text = check_vars_and_funcs(text, var, text.split('\n')[z], flag)
     text = text.replace(" ( ", "(")
     text = text.replace(" ) ", ")")
     text = text.replace(" , ", ",")
-    text=text.replace(" & ","&")
-    
-    
+    text = text.replace(" & ", "&")
+
     return text
 
 
@@ -366,29 +378,28 @@ def clear_var_name(var):
 
 
 def check_vars_and_funcs(text, var, line_to_replace, flag):  # flag 1 can del, flag 0 only rename
-    #print(line_to_replace)
-    if text.find(var) == text.rfind(var) and var != "main" and not "main" in line_to_replace and flag == 1:
+    # print(line_to_replace)
+    if text.find(var) == text.rfind(var) and var != "main" and not "main" not in line_to_replace and flag == 1:
         if var + "(" in line_to_replace.replace(" ", ""):
-            #print(var,line_to_replace)
-            text = delete_function(text, var, line_to_replace)
+            # print(var,line_to_replace)
+            text = delete_function(text, line_to_replace)
         else:
-            #print(var,line_to_replace)
-            #print(var)
+            # print(var,line_to_replace)
+            # print(var)
             text = text.replace(line_to_replace, "")
     elif change_var_names_on:
-        #print(var,"1")
+        # print(var,"1")
         text = change_var_names(text, var)
     return text
 
 
-def delete_function(text, var, line_to_replace):
-    #print(line_to_replace, text)
+def delete_function(text, line_to_replace):
     text = text.split("\n")
     n = -1
     open_brackets_counter = 0
     for i in range(0, len(text)):
         if line_to_replace in text[i] and n == -1:
-            
+
             for j in text[i]:
                 if j == "{":
                     open_brackets_counter += 1
@@ -477,7 +488,7 @@ def remove_not_used_defines(text):
 def semicolon_endl(text):
     text = text.split("\n")
     for i in range(1, len(text)):
-        if not "define" in text[i]:
+        if "define" not in text[i]:
             text[i] = text[i].replace(";", ";\n    ")
     text_l = text
     text = ""
@@ -492,9 +503,8 @@ def semicolon_endl(text):
 def comma_to_full(text):
     text = text.split("\n")
     for i in range(1, len(text)):
-        if "," in text[i] and not "(" in text[i] and not "{" in text[i] and not "[" in text[i] and not "<" in text[
-            i]:  # kostyl
-            for j in types:
+        if "," in text[i] and "(" not in text[i] and "{" not in text[i] and "[" not in text[i] and "<" not in text[i]:
+            for j in types:  # TODO kostyl
                 if j in text[i].split()[0]:
                     text[i] = text[i].replace(", ", "; \n    " + j + " ")
                     text[i] = text[i].replace(",", "; \n    " + j + " ")
@@ -533,7 +543,7 @@ def random_endl(text):
 def text_space_before_bracket(text):
     text = text.split("\n")
     for i in range(0, len(text)):
-        if not "define" in text[i]:
+        if "define" not in text[i]:
             text[i] = text[i].replace(" (", "(")
             text[i] = text[i].replace("(", " (")
     text_l = text
@@ -571,7 +581,7 @@ def clear_spaces(text):
     i = 1
     open_bracket_counter = 0
     while i < len(text) - 1:  # -1!
-        
+
         if text[i] in "\"\'" and open_bracket_counter == 0:
             open_bracket_counter += 1
         elif text[i] in "\"\'" and open_bracket_counter == 1:  # kostyl
@@ -600,23 +610,20 @@ def clear_spaces(text):
 # ==========
 
 
-with open("input.txt", "r") as f:
-    text = f.read()
-
+def get_cleaned_text(text, n):
     # LEAVE #1
     if remove_comments_on:
         text = commentRemover(text)
 
-    if 1:    
+    if 1:
         # experimental part that theoretically can help avoid some errors
-        text = text.replace("typedef long long ll;", "#define ll long long")#TODO?
+        text = text.replace("typedef long long ll;", "#define ll long long")  # TODO?
         text = text.replace("typedef long double ld;", "#define ld long double")
         text = text.replace(", ", ",")
         text = text.replace(",", ", ")
         text = text.replace("> ", ">")
         text = text.replace(">", "> ")
         text = text.replace("> >", ">>")
-
 
     if clear_spaces_on:
         text = clear_spaces(text)
@@ -642,7 +649,6 @@ with open("input.txt", "r") as f:
 
     if remove_not_used_defines_on:
         text = remove_not_used_defines(text)
-        
 
     if const_to_code_on:
         text = const_plus_to_space(text)
@@ -665,21 +671,36 @@ with open("input.txt", "r") as f:
         text = bad_codestyle(text)
         text = dotcomma_endl(text)
 
-    if remove_not_used_funcs_on:
+    if remove_not_used_funcs_on and n == 0:
         text = remove_not_used_funcs(text)
 
     # IMPORTANT: LEAVE THAT LAST-2
     if delete_empty_lines_on:
         text = delete_empty_lines(text)
     # IMPORTANT: LEAVE THAT LAST-1
-    if random_endlines_on:
+    if random_endlines_on and n == 0:
         text = random_endl(text)
 
         # LEAVE THAT LAST
     if one_line_program_on:
         text = one_line_program(text)
+    if clear_spaces_on:
+        text = clear_spaces(text)
 
-    text=text.replace(")",") ")
-    text=text.replace(") )","))")
+    text = text.replace(")", ") ")
+    text = text.replace(") )", "))")
+    return text
 
-print(text)
+
+with open("input.txt", "r") as f:
+    text = f.read()
+    text1 = text
+    text = get_cleaned_text(text, 0)
+    i = 1
+    while text1 != text and i != 100:  # TODO kostyl na vsyakiy sluchay xd
+        i += 1
+        text1 = text
+        text = get_cleaned_text(text, i)  # TODO kak inache??
+    else:
+        text = get_cleaned_text(text, 0)
+    print(text)
