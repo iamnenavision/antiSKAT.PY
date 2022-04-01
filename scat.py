@@ -378,17 +378,12 @@ def clear_var_name(var):
 
 
 def check_vars_and_funcs(text, var, line_to_replace, flag):  # flag 1 can del, flag 0 only rename
-    # print(line_to_replace)
     if text.find(var) == text.rfind(var) and var != "main" and not "main" not in line_to_replace and flag == 1:
         if var + "(" in line_to_replace.replace(" ", ""):
-            # print(var,line_to_replace)
             text = delete_function(text, line_to_replace)
         else:
-            # print(var,line_to_replace)
-            # print(var)
             text = text.replace(line_to_replace, "")
     elif change_var_names_on:
-        # print(var,"1")
         text = change_var_names(text, var)
     return text
 
@@ -657,7 +652,7 @@ def get_cleaned_text(text, n):
 
     if replace_libs_to_bitsstd_on:
         text = replace_libs_to_bitsstd(text)
-
+    
     if return0_check_on:
         text = return0_check(text)
 
@@ -677,18 +672,23 @@ def get_cleaned_text(text, n):
     # IMPORTANT: LEAVE THAT LAST-2
     if delete_empty_lines_on:
         text = delete_empty_lines(text)
+
+    if clear_spaces_on:
+        text = clear_spaces(text)
+       
     # IMPORTANT: LEAVE THAT LAST-1
     if random_endlines_on and n == 0:
         text = random_endl(text)
-
+    
         # LEAVE THAT LAST
     if one_line_program_on:
         text = one_line_program(text)
-    if clear_spaces_on:
-        text = clear_spaces(text)
-
+    
     text = text.replace(")", ") ")
     text = text.replace(") )", "))")
+    text = text.replace("    ;", "     ;")
+    text = text.replace(" ;", ";")
+    
     return text
 
 
@@ -700,7 +700,7 @@ with open("input.txt", "r") as f:
     while text1 != text and i != 100:  # TODO kostyl na vsyakiy sluchay xd
         i += 1
         text1 = text
-        text = get_cleaned_text(text, i)  # TODO kak inache??
+        text = get_cleaned_text(text, i)  # TODO kak inache??        
     else:
         text = get_cleaned_text(text, 0)
     print(text)
