@@ -692,8 +692,8 @@ def get_cleaned_text(text, n):
     return text
 
 
-with open("input.txt", "r") as f:
-    text = f.read()
+def go_skat(message):
+    text = message
     text1 = text
     text = get_cleaned_text(text, 0)
     i = 1
@@ -703,4 +703,4 @@ with open("input.txt", "r") as f:
         text = get_cleaned_text(text, i)  # TODO kak inache??        
     else:
         text = get_cleaned_text(text, 0)
-    print(text)
+    return text
