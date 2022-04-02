@@ -9,7 +9,7 @@ types = ["#define", "wchar_t", "vector<vector<int>>", "vector<int>", "vector<lon
          "unsigned short", "signed short", "unsigned long long", "long long",
          "float", "long double", "double", "bool", "void", "int32_t", "int64_t", "long", "int", "short", "string",
          "struct", "vector<", "set", "pair"]
-null_false_zeros = ["Null", "NULL", "False", "0", "null", "false", "FALSE", "fALSE"]
+null_false_zeros = ["Null", "NULL", "False", "0", "null", "false", "FALSE","nullptr"]
 loop_names = ["for", "while", "else", "elif", "if", "case"]
 open_brackets = "([{"
 open_brackets_for_clearing_spaces = "(["
@@ -23,6 +23,7 @@ syntax_symbs = space + closed_brackets + open_brackets + other_syntax_symbs
 # =====settings===================================
 clear_spaces_on = 1  # clear not needed " " and "\n"'s
 delete_cout_tie_on = 1  # Delete "cout.tie(0);"
+zero_in_fast_input_on = 1 # cout.tie(Null); etc to cout.tie(0);
 remove_comments_on = 1  # Remove all comments
 delete_empty_lines_on = 1  # Remove empty lines. HIGHLY RECOMMENDED coz some functions leaves empty lines.
 random_endlines_on = 1  # Add random end lines
@@ -61,10 +62,8 @@ one_line_program_on = 0  # 2-liner from program
 # norm proverka peremennyh - ?
 # upgrade cout.tie(0);!!!!!!
 # titov codestyle
-# rename defs PEP8
-# 2D TROLLING
-# CODED CODE
-# todo kak inache
+# 2D TABS and \ns TROLLING
+# CODED CODE?
 
 # ==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
@@ -209,17 +208,10 @@ def return0_check(text):
 # ==========
 
 # ==========DELETE COUTTIE0 IF THERE ARE
-def delete_cout_tie(text):
-    # TODOfor i in null_false_zeros:
-    #    text = text.replace("ios::sync_with_stdio ("+i+");", "ios::sync_with_stdio (0); \n    cin.tie(0);")
-    #    text = text.replace("ios::sync_with_stdio("+i+");", "ios::sync_with_stdio (0); \n    cin.tie(0);")
-    text = text.replace("cout.tie(0);", "")
-    text = text.replace("cout.tie (0);", "")
-    text = text.replace("cout.tie(False);", "")
-    text = text.replace("cout.tie(false);", "")
-    text = text.replace("cout.tie(NULL);", "")
-    text = text.replace("cout.tie(null);", "")
-    text = text.replace("cout.tie(Null);", "")
+def delete_cout_tie(text): 
+    for i in null_false_zeros:
+        text = text.replace("cout.tie("+i+");", "")
+    
     return text
 
 
@@ -232,7 +224,6 @@ def add_fast_input(text):
     elif "ios::sync_with_stdio" in text and "cin.tie" not in text and "cin. tie" not in text:
         for i in null_false_zeros:
             text = text.replace("ios::sync_with_stdio (" + i + ");", "ios::sync_with_stdio (0); \n    cin.tie(0);")
-            text = text.replace("ios::sync_with_stdio(" + i + ");", "ios::sync_with_stdio (0); \n    cin.tie(0);")
     return text
 
 
@@ -306,6 +297,7 @@ def const_to_define(text):
             if "const" in text[i].split()[0]:
                 for j in types:
                     text[i] = text[i].replace("const " + j, "#define")
+                    
     text_l = text
     text = ""
     for i in text_l:
@@ -318,15 +310,14 @@ def const_to_define(text):
 
 # ==========REMOVE UNUSED VARS AND FUNCS AND change_var_names
 def remove_not_used_funcs(text):
-    # print(text)
-    text = text
     text = text.replace("(", " ( ")
     text = text.replace(")", " ) ")
     text = text.replace(",", " , ")
     text = text.replace("&", " & ")
     text = text.replace("\n  ", "\n        ")
-    text = text.replace("\n    ", "\n ")  # TODO maybe bug
+    text = text.replace("\n    ", "\n ")
     text = text.replace("  ", " ")
+    
     for z in range(0, len(text.split('\n'))):
         line = text.split('\n')[z].split()
         for i in range(0, len(line) - 1):
@@ -338,18 +329,15 @@ def remove_not_used_funcs(text):
                     i += 1
                 if line[i + 1] not in types:
                     flag = 1  # flag 1 can del, flag 0 only rename
-                    if line[i + 1][-1] == "(":  # func name
-                        # print(line[i+1],"function, del ALLOWED")
+                    if line[i + 1][-1] == "(":  # line[i + 1][-1] - func name
                         flag = 1  # function, del ALLOWED
                     elif len(line) > i + 2:
                         if line[i + 2][0] == "(":
                             flag = 1
                     else:
                         if "(" in line:
-                            # print(line[i+1],"var, del DENIED")
                             flag = 0  # var, del DENIED
                         else:
-                            # print(line[i+1],"var, del ALLOWED")
                             flag = 1  # var, del ALLOWED
 
                     var = clear_var_name(line[i + 1])
@@ -437,7 +425,7 @@ def generate_random_name(text):
     for _ in range(1, random.randint(random_name_length[0], random_name_length[1])):
         random_integer = random.randint(97, 97 + 26 - 1)
         while str(chr(random_integer)) in vowel and not generate_only_not_vowels_on:
-            random_integer = random.randint(97, 97 + 26 - 1)  # Considering only upper and lowercase letters
+            random_integer = random.randint(97, 97 + 26 - 1)  # considering only upper and lowercase letters
         random_integer = random_integer
         random_string += (chr(random_integer))
     if generate_first_letter_uppercase_on:
@@ -604,6 +592,18 @@ def clear_spaces(text):
 
 # ==========
 
+# ==========
+def zero_in_fast_input(text):
+    for i in syntax_symbs:
+        for j in syntax_symbs:
+            for k in null_false_zeros:
+                text=text.replace(i+"cin.tie("+k+")"+j,i+"cin.tie(0)"+j)
+                text=text.replace(i+"ios_base::sync_with_stdio("+k+")"+j,i+"ios_base::sync_with_stdio(0)"+j)
+    return text
+# ==========
+
+
+
 
 def get_cleaned_text(text, n):
     # LEAVE #1
@@ -619,12 +619,15 @@ def get_cleaned_text(text, n):
         text = text.replace("> ", ">")
         text = text.replace(">", "> ")
         text = text.replace("> >", ">>")
-
+    
     if clear_spaces_on:
         text = clear_spaces(text)
 
     if semicolon_endl_on:
         text = semicolon_endl(text)
+
+    if zero_in_fast_input_on:
+        text=zero_in_fast_input(text)
 
     if using_to_define_on:
         text = using_to_define(text)
@@ -638,17 +641,23 @@ def get_cleaned_text(text, n):
     if clear_defines_on:
         text = clear_defines(text)
 
-    if const_to_define_on:
-        text = const_plus_to_space(text)
-        text = const_to_define(text)
+    if const_to_define_on or const_to_code_on:
+        text=text.replace(" (","(")
+        text=text.replace("("," (")
+        if const_to_define_on:
+            text = const_plus_to_space(text)
+            text = const_to_define(text)
+        elif const_to_code_on:
+            text = const_plus_to_space(text)
+            text = const_to_define(text)
+            text = clear_spaces(text)        
+            text = clear_defines(text)
+        text = clear_spaces(text)
 
+
+        
     if remove_not_used_defines_on:
         text = remove_not_used_defines(text)
-
-    if const_to_code_on:
-        text = const_plus_to_space(text)
-        text = const_to_define(text)
-        text = clear_defines(text)
 
     if replace_libs_to_bitsstd_on:
         text = replace_libs_to_bitsstd(text)
@@ -697,10 +706,10 @@ def go_skat(message):
     text1 = text
     text = get_cleaned_text(text, 0)
     i = 1
-    while text1 != text and i != 100:  # TODO kostyl na vsyakiy sluchay xd
+    while text1 != text and i != 100:
         i += 1
         text1 = text
-        text = get_cleaned_text(text, i)  # TODO kak inache??        
+        text = get_cleaned_text(text, i)  # TODO?        
     else:
         text = get_cleaned_text(text, 0)
     return text
