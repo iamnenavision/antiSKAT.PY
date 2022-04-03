@@ -50,7 +50,7 @@ random_name_length = [1, 4]
 name_exceptions = []
 
 # ==TROLLING:
-titov_codestyle_on = 0  # NOT RECOMMENDED. add comments after } like "for i {          } //for" USE VS to fix codestyle
+titov_codestyle_on = 0  # add comments after } like "for i {          } //for" and delete tabulations
 one_line_program_on = 0  # 2-liner from program
 
 
