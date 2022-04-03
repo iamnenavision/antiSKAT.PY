@@ -9,7 +9,7 @@ types = ["#define", "wchar_t", "vector<vector<int>>", "vector<int>", "vector<lon
          "unsigned short", "signed short", "unsigned long long", "long long",
          "float", "long double", "double", "bool", "void", "int32_t", "int64_t", "long", "int", "short", "string",
          "struct", "vector<", "set", "pair"]
-null_false_zeros = ["Null", "NULL", "False", "0", "null", "false", "FALSE","nullptr"]
+null_false_zeros = ["Null", "NULL", "False", "0", "null", "false", "FALSE", "nullptr"]
 loop_names = ["for", "while", "else", "elif", "if", "case"]
 open_brackets = "([{"
 open_brackets_for_clearing_spaces = "(["
@@ -23,7 +23,7 @@ syntax_symbs = space + closed_brackets + open_brackets + other_syntax_symbs
 # =====settings===================================
 clear_spaces_on = 1  # clear not needed " " and "\n"'s
 delete_cout_tie_on = 1  # Delete "cout.tie(0);"
-zero_in_fast_input_on = 1 # cout.tie(Null); etc to cout.tie(0);
+zero_in_fast_input_on = 1  # cout.tie(Null); etc to cout.tie(0);
 remove_comments_on = 1  # Remove all comments
 delete_empty_lines_on = 1  # Remove empty lines. HIGHLY RECOMMENDED coz some functions leaves empty lines.
 random_endlines_on = 1  # Add random end lines
@@ -50,6 +50,7 @@ random_name_length = [1, 4]
 name_exceptions = []
 
 # ==TROLLING:
+titov_codestyle_on = 0  # NOT RECOMMENDED. add comments after } like "for i {          } //for" USE VS to fix codestyle
 one_line_program_on = 0  # 2-liner from program
 
 
@@ -60,10 +61,10 @@ one_line_program_on = 0  # 2-liner from program
 # typedef to define
 # proverka na solve()
 # norm proverka peremennyh - ?
-# upgrade cout.tie(0);!!!!!!
-# titov codestyle
+# norm proverka funciy - vizov iz samoy sebya ili izvne?
 # 2D TABS and \ns TROLLING
-# CODED CODE?
+# define-CODED CODE?
+# svoya funcia replace kotoraya ne replacit v "stringah"
 
 # ==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
@@ -183,7 +184,7 @@ def replace_libs_to_bitsstd(text):
 
 def delete_empty_lines(text):
     text = "".join([s for s in text.strip().splitlines(True) if s.strip()])
-    text = text.replace("\n}", "\n}\n")
+    # text = text.replace("\n}", "\n}\n") TODO
     return text
 
 
@@ -208,10 +209,10 @@ def return0_check(text):
 # ==========
 
 # ==========DELETE COUTTIE0 IF THERE ARE
-def delete_cout_tie(text): 
+def delete_cout_tie(text):
     for i in null_false_zeros:
-        text = text.replace("cout.tie("+i+");", "")
-    
+        text = text.replace("cout.tie(" + i + ");", "")
+
     return text
 
 
@@ -253,6 +254,10 @@ def one_line_program(text):
 
 # ==========" BAD CODESTYLE AS{"->" \n{" "...; ....;" to "...;\n...;" 1e6=1000000 etc.
 def bad_codestyle(text):
+    text = text.replace("\n}\n", "\n}\n\n")
+    text = text.replace("\n} \n", "\n} \n\n")
+    # text = text.replace("\n};\n", "\n};\n\n")
+    # text = text.replace("\n}; \n", "\n}; \n\n")
     text = text.replace(" {\n", " \n    {\n")
     return text
 
@@ -297,7 +302,7 @@ def const_to_define(text):
             if "const" in text[i].split()[0]:
                 for j in types:
                     text[i] = text[i].replace("const " + j, "#define")
-                    
+
     text_l = text
     text = ""
     for i in text_l:
@@ -317,7 +322,7 @@ def remove_not_used_funcs(text):
     text = text.replace("\n  ", "\n        ")
     text = text.replace("\n    ", "\n ")
     text = text.replace("  ", " ")
-    
+
     for z in range(0, len(text.split('\n'))):
         line = text.split('\n')[z].split()
         for i in range(0, len(line) - 1):
@@ -471,7 +476,7 @@ def remove_not_used_defines(text):
 def semicolon_endl(text):
     text = text.split("\n")
     for i in range(1, len(text)):
-        if "define" not in text[i]:
+        if "define" not in text[i] and "for" not in text[i]:
             text[i] = text[i].replace(";", ";\n    ")
     text_l = text
     text = ""
@@ -495,7 +500,7 @@ def comma_to_full(text):
     text = ""
     for i in text_l:
         text += i + "\n"
-    return (text)
+    return text
 
 
 # ==========
@@ -587,6 +592,9 @@ def clear_spaces(text):
             if text[j] not in "{};>\n":
                 text = text[:i] + " " + text[i + 1:]
         i += 1
+    text = text.replace("> ", ">")
+    text = text.replace(">", "> ")
+    text = text.replace("> >", ">>")
     return text
 
 
@@ -597,12 +605,80 @@ def zero_in_fast_input(text):
     for i in syntax_symbs:
         for j in syntax_symbs:
             for k in null_false_zeros:
-                text=text.replace(i+"cin.tie("+k+")"+j,i+"cin.tie(0)"+j)
-                text=text.replace(i+"ios_base::sync_with_stdio("+k+")"+j,i+"ios_base::sync_with_stdio(0)"+j)
+                text = text.replace(i + "cin.tie(" + k + ")" + j, i + "cin.tie(0)" + j)
+                text = text.replace(i + "ios_base::sync_with_stdio(" + k + ")" + j,
+                                    i + "ios_base::sync_with_stdio(0)" + j)
     return text
+
+
 # ==========
 
+def titoff(string):
+    f = string.split('\n')
+    for i in range(len(f)):
+        f[i] += '\n'
+    output_code = ""
+    prev = ''
+    words = []
+    gap = False
 
+    for line in f:
+        if gap:
+            gap = False
+            prev = line
+            continue
+        outline = ''
+
+        tabulation = True
+        tab = 0
+        comment = len(prev)
+        for ch in range(comment - 1):
+            if prev[ch] == '/' and prev[ch + 1] == '/':
+                comment = ch
+                break
+            if (prev[ch] == '\t' or prev[ch] == ' ') and tabulation:
+                tab = ch + 1
+            else:
+                tabulation = False
+
+        outline += prev[tab:comment]
+
+        charr = line.replace(' ', '').replace('\t', '')
+        if charr.count('//') > 0:
+            charr = charr[:charr.index('/') - 1]
+
+        if len(charr) > 1:
+            charr = charr[:-1]
+
+        if charr == '{':
+            outline = outline[:-1]
+            outline += ' {\n'
+            gap = True
+        if outline.count('{') == 1:
+            match outline[:2]:
+                case 'fo':
+                    words.append('// for')
+                case 'wh':
+                    words.append('// while')
+                case 'if':
+                    words.append('// if')
+                case 'sw':
+                    words.append('// switch')
+                case 'el':
+                    if outline.count('else if') > 0:
+                        words.append('// else if')
+                    else:
+                        words.append('// else')
+                case _:
+                    words.append('')
+        if prev.count('}') > 0:
+            outline = outline[:-1] + ' '
+            if len(words) > 0:
+                outline += words.pop(-1) + '\n'
+
+        prev = line
+        output_code += outline + '\n    '
+    return output_code
 
 
 def get_cleaned_text(text, n):
@@ -619,7 +695,7 @@ def get_cleaned_text(text, n):
         text = text.replace("> ", ">")
         text = text.replace(">", "> ")
         text = text.replace("> >", ">>")
-    
+
     if clear_spaces_on:
         text = clear_spaces(text)
 
@@ -627,7 +703,7 @@ def get_cleaned_text(text, n):
         text = semicolon_endl(text)
 
     if zero_in_fast_input_on:
-        text=zero_in_fast_input(text)
+        text = zero_in_fast_input(text)
 
     if using_to_define_on:
         text = using_to_define(text)
@@ -642,26 +718,24 @@ def get_cleaned_text(text, n):
         text = clear_defines(text)
 
     if const_to_define_on or const_to_code_on:
-        text=text.replace(" (","(")
-        text=text.replace("("," (")
+        text = text.replace(" (", "(")
+        text = text.replace("(", " (")
         if const_to_define_on:
             text = const_plus_to_space(text)
             text = const_to_define(text)
         elif const_to_code_on:
             text = const_plus_to_space(text)
             text = const_to_define(text)
-            text = clear_spaces(text)        
+            text = clear_spaces(text)
             text = clear_defines(text)
         text = clear_spaces(text)
 
-
-        
     if remove_not_used_defines_on:
         text = remove_not_used_defines(text)
 
     if replace_libs_to_bitsstd_on:
         text = replace_libs_to_bitsstd(text)
-    
+
     if return0_check_on:
         text = return0_check(text)
 
@@ -678,31 +752,39 @@ def get_cleaned_text(text, n):
     if remove_not_used_funcs_on and n == 0:
         text = remove_not_used_funcs(text)
 
+    # TODO
+    if titov_codestyle_on and n==0 and one_line_program_on!=1:
+        text = titoff(text)
+
     # IMPORTANT: LEAVE THAT LAST-2
+
     if delete_empty_lines_on:
         text = delete_empty_lines(text)
 
     if clear_spaces_on:
         text = clear_spaces(text)
-       
+
     # IMPORTANT: LEAVE THAT LAST-1
     if random_endlines_on and n == 0:
         text = random_endl(text)
-    
+
         # LEAVE THAT LAST
     if one_line_program_on:
         text = one_line_program(text)
-    
+    elif n == 0:
+        text = text.replace("\n}\n", "\n}\n\n")
+        text = text.replace("\n};\n", "\n};\n\n")
+        text = text.replace(",",", ")
+
     text = text.replace(")", ") ")
     text = text.replace(") )", "))")
     text = text.replace("    ;", "     ;")
     text = text.replace(" ;", ";")
-    
+
     return text
 
 
-def go_skat(message):
-    text = message
+def go_skat(text):
     text1 = text
     text = get_cleaned_text(text, 0)
     i = 1
