@@ -2,7 +2,6 @@ import re
 import random
 
 # =====system_settings============================
-vowel = "aeiouy"
 types = ["#define", "wchar_t", "vector<vector<int>>", "vector<int>", "vector<long long>", "vector<char>",
          "vector<bool>",
          "vector<long>", "unsigned char", "signed char", "unsigned int", "char", "signed int", "short int",
@@ -10,50 +9,46 @@ types = ["#define", "wchar_t", "vector<vector<int>>", "vector<int>", "vector<lon
          "float", "long double", "double", "bool", "void", "int32_t", "int64_t", "long", "int", "short", "string",
          "struct", "vector<", "set", "pair"]
 null_false_zeros = ["Null", "NULL", "False", "0", "null", "false", "FALSE", "nullptr"]
+vowel = "aeiouy"
 loop_names = ["for", "while", "else", "elif", "if", "case"]
 open_brackets = "([{"
 open_brackets_for_clearing_spaces = "(["
 closed_brackets = ")]}"
 closed_brackets_for_clearing_spaces = ")]"
 space = " "
-other_syntax_symbs = ";\n\t,<>+=-:.*/!%&$#@"
-syntax_symbs = space + closed_brackets + open_brackets + other_syntax_symbs
+other_syntax_symbols = ";\n\t,<>+=-:.*/!%&$#@"
+syntax_symbols = space + closed_brackets + open_brackets + other_syntax_symbols
 # ================================================
 
 # =====settings===================================
 clear_spaces_on = 1  # clear not needed " " and "\n"'s
-delete_cout_tie_on = 1  # Delete "cout.tie(0);"
-zero_in_fast_input_on = 1  # cout.tie(Null); etc to cout.tie(0);
-remove_comments_on = 1  # Remove all comments
-delete_empty_lines_on = 1  # Remove empty lines. HIGHLY RECOMMENDED coz some functions leaves empty lines.
-random_endlines_on = 1  # Add random end lines
+delete_cout_tie_zero_on = 1
+zero_in_fast_input_on = 1  # cout.tie(Null); to cout.tie(0); etc
+remove_comments_on = 1
+delete_empty_lines_on = 1  # Remove empty lines. HIGHLY RECOMMENDED coz some functions leaves empty lines
+random_endlines_on = 1
 clear_defines_on = 1  # clear #DEFINES from the code
-replace_libs_to_bitsstd_on = 1  # replace all libraries with BITS/STDC++.H
+replace_libs_to_bitsstd_on = 1  # replace all libraries to BITS/STDC++.H
 return0_check_on = 1  # add return 0; if there aren't
 add_fast_input_on = 1  # add fast input if there aren't
 const_to_define_on = 0  # replace const by define
 #   OR
 const_to_code_on = 1  # const into code
-semicolon_endl_on = 1  # ; -> ;\n
+print_endline_after_semicolon_on = 1
 comma_to_full_on = 1  # long long i,c -> long long i long long c
 remove_not_used_funcs_on = 1  # remove useless vars and funcs from code
-remove_not_used_defines_on = 1  # remove_not_used_defines
-ANTI_1e6_to_1000000_on = 1  # replace 1e6 1e7 etc
-bad_codestyle_on = 1  # " {"->" \n\{"  , "..; ...;" to "...;\n ...;"
+exponent_to_decimal_on = 1  # replace 1e6 to 1000000, 1e7 to 10000000 etc
+some_codestyle_changes_on = 1  # " {"->" \n\{"  , "..; ...;" to "...;\n ...;"
 using_to_define_on = 1
 # =====CHANGE VAR NAMES SETTINGS:===================
 change_var_names_on = 1  # change_var_names on random
-generate_only_not_vowels_on = 1  # not generate only vowels
-generate_first_letter_uppercase_on = 0  # generate 1st char uppercase
-bad_generator_on = 0  # NOT RECOMMENDED. reinsurance when searching for existing variables
-random_name_length = [1, 4]
+generate_only_not_vowels_on = 0
+generate_first_letter_uppercase_on = 0
+random_name_length = [1, 5]
 name_exceptions = []
-
 # ==TROLLING:
-titov_codestyle_on = 0  # add comments after } like "for i {          } //for" and delete tabulations
-one_line_program_on = 0  # 2-liner from program
-
-
+titov_codestyle_on = 0  # not working with one-liner function. add comments after } like "for i {          } //for"
+two_line_program_on = 0  # turns program into 2-liner
 # ================================================
 
 
@@ -157,10 +152,10 @@ def clear_defines(text):
             if "(" in splited_line[1] and ")" in splited_line[1] and "()" not in splited_line[1]:
                 continue
             text = text.replace(line, "")
-            for i in range(0, len(syntax_symbs)):
-                for j in range(0, len(syntax_symbs)):
-                    text = text.replace(syntax_symbs[i] + splited_line[1] + syntax_symbs[j],
-                                        syntax_symbs[i] + splited_line[2] + syntax_symbs[j])
+            for i in range(0, len(syntax_symbols)):
+                for j in range(0, len(syntax_symbols)):
+                    text = text.replace(syntax_symbols[i] + splited_line[1] + syntax_symbols[j],
+                                        syntax_symbols[i] + splited_line[2] + syntax_symbols[j])
     return text
 
 
@@ -209,7 +204,7 @@ def return0_check(text):
 # ==========
 
 # ==========DELETE COUTTIE0 IF THERE ARE
-def delete_cout_tie(text):
+def delete_cout_tie_zero(text):
     for i in null_false_zeros:
         text = text.replace("cout.tie(" + i + ");", "")
 
@@ -253,16 +248,14 @@ def one_line_program(text):
 # ==========
 
 # ==========" BAD CODESTYLE AS{"->" \n{" "...; ....;" to "...;\n...;" 1e6=1000000 etc.
-def bad_codestyle(text):
+def some_codestyle_changes(text):
     text = text.replace("\n}\n", "\n}\n\n")
     text = text.replace("\n} \n", "\n} \n\n")
-    # text = text.replace("\n};\n", "\n};\n\n")
-    # text = text.replace("\n}; \n", "\n}; \n\n")
     text = text.replace(" {\n", " \n    {\n")
     return text
 
 
-def ANTI_1e6_to_1000000(text):
+def exponent_to_decimal(text):
     for i in range(9, 0, -1):
         for j in range(20, 0, -1):
             text = text.replace(str(i) + "e" + str(j), str(i) + "0" * j)
@@ -327,7 +320,7 @@ def remove_not_used_funcs(text):
         line = text.split('\n')[z].split()
         for i in range(0, len(line) - 1):
             if not (line[i] in types or "vector<" in line[i]):
-                for j in syntax_symbs:
+                for j in syntax_symbols:
                     line[i] = line[i].replace(j, "")
             if line[i] in types or "vector<" in line[i]:
                 if line[i + 1] == "&" or "":
@@ -360,10 +353,10 @@ def remove_not_used_funcs(text):
 def clear_var_name(var):
     var_temp = var
     var = ""
-    if var_temp[0] in syntax_symbs:
+    if var_temp[0] in syntax_symbols:
         var_temp = var_temp[:-1]
     for i in var_temp:
-        if i not in syntax_symbs:
+        if i not in syntax_symbols:
             var += i
         else:
             break
@@ -415,13 +408,10 @@ def delete_function(text, line_to_replace):
 
 
 def var_exists(text, var):
-    for i in syntax_symbs:
-        for j in syntax_symbs:
+    for i in syntax_symbols:
+        for j in syntax_symbols:
             if text.find(i + var + j) != -1:
                 return 1
-            if bad_generator_on:
-                if text.find(var) != -1:
-                    return 1
     return 0
 
 
@@ -429,7 +419,8 @@ def generate_random_name(text):
     random_string = ""
     for _ in range(1, random.randint(random_name_length[0], random_name_length[1])):
         random_integer = random.randint(97, 97 + 26 - 1)
-        while str(chr(random_integer)) in vowel and not generate_only_not_vowels_on:
+        while str(chr(random_integer)) in vowel and \
+                generate_only_not_vowels_on:
             random_integer = random.randint(97, 97 + 26 - 1)  # considering only upper and lowercase letters
         random_integer = random_integer
         random_string += (chr(random_integer))
@@ -445,35 +436,16 @@ def change_var_names(text, var):
     if "main" in var:
         return text
     random_name = generate_random_name(text)
-    for i in syntax_symbs:
-        for j in syntax_symbs:
+    for i in syntax_symbols:
+        for j in syntax_symbols:
             text = text.replace(i + var + j, i + random_name + j)
     return text
 
 
 # ==========
 
-# ==========
-def remove_not_used_defines(text):
-    for line in text.split("\n"):
-        if "#define" in line.lower():
-            line_splited = clever_split(line)
-            stringg = ""
-            for i in line_splited[1]:
-                if i != "(":
-                    stringg += i
-                else:
-                    break
-            if text.find(stringg) == text.rfind(stringg):
-                text = text.replace(line, "")
-    return text
-
-
-# ==========
-
-
 # ==========; -> ;\n
-def semicolon_endl(text):
+def print_endline_after_semicolon(text):
     text = text.split("\n")
     for i in range(1, len(text)):
         if "define" not in text[i] and "for" not in text[i]:
@@ -547,7 +519,7 @@ def text_space_before_bracket(text):
 def using_to_define(text):
     text = text.split("\n")
     for i in range(0, len(text)):
-        if "using" in text[i] and "=" in text[i]:
+        if "using" in text[i] and "=" in text[i] and "using namespace std" not in text[i]:
             text[i] = text[i].replace("using", "#define")
             text[i] = text[i].replace(" = ", " ")
             text[i] = text[i].replace(" =", " ")
@@ -576,10 +548,10 @@ def clear_spaces(text):
             open_bracket_counter -= 1
         elif text[i] == " " and open_bracket_counter == 0:
             if text[i - 1].isalnum():
-                if text[i + 1] in syntax_symbs:
+                if text[i + 1] in syntax_symbols:
                     text = text[:i] + text[i + 1:]
-            if text[i - 1] in syntax_symbs:
-                if text[i + 1].isalnum() or text[i + 1] in syntax_symbs:
+            if text[i - 1] in syntax_symbols:
+                if text[i + 1].isalnum() or text[i + 1] in syntax_symbols:
                     j = i
                     while text[j] == " " and j != 0:
                         j -= 1
@@ -602,8 +574,8 @@ def clear_spaces(text):
 
 # ==========
 def zero_in_fast_input(text):
-    for i in syntax_symbs:
-        for j in syntax_symbs:
+    for i in syntax_symbols:
+        for j in syntax_symbols:
             for k in null_false_zeros:
                 text = text.replace(i + "cin.tie(" + k + ")" + j, i + "cin.tie(0)" + j)
                 text = text.replace(i + "ios_base::sync_with_stdio(" + k + ")" + j,
@@ -613,16 +585,16 @@ def zero_in_fast_input(text):
 
 # ==========
 
-def titoff(string):
-    f = string.split('\n')
-    for i in range(len(f)):
-        f[i] += '\n'
+def titov_codestyle(text):
+    text = text.split('\n')
+    for i in range(len(text)):
+        text[i] += '\n'
     output_code = ""
     prev = ''
     words = []
     gap = False
 
-    for line in f:
+    for line in text:
         if gap:
             gap = False
             prev = line
@@ -682,6 +654,11 @@ def titoff(string):
 
 
 def get_cleaned_text(text, n):
+    oneline_time = 0
+    if n == 1:
+        oneline_time = 1
+        n = 0
+
     # LEAVE #1
     if remove_comments_on:
         text = commentRemover(text)
@@ -699,8 +676,8 @@ def get_cleaned_text(text, n):
     if clear_spaces_on:
         text = clear_spaces(text)
 
-    if semicolon_endl_on:
-        text = semicolon_endl(text)
+    if print_endline_after_semicolon_on:
+        text = print_endline_after_semicolon(text)
 
     if zero_in_fast_input_on:
         text = zero_in_fast_input(text)
@@ -711,8 +688,8 @@ def get_cleaned_text(text, n):
     if comma_to_full_on:
         text = comma_to_full(text)
 
-    if ANTI_1e6_to_1000000_on:
-        text = ANTI_1e6_to_1000000(text)
+    if exponent_to_decimal_on:
+        text = exponent_to_decimal(text)
 
     if clear_defines_on:
         text = clear_defines(text)
@@ -730,31 +707,28 @@ def get_cleaned_text(text, n):
             text = clear_defines(text)
         text = clear_spaces(text)
 
-    if remove_not_used_defines_on:
-        text = remove_not_used_defines(text)
-
     if replace_libs_to_bitsstd_on:
         text = replace_libs_to_bitsstd(text)
 
     if return0_check_on:
         text = return0_check(text)
 
-    if delete_cout_tie_on:
-        text = delete_cout_tie(text)
+    if delete_cout_tie_zero_on:
+        text = delete_cout_tie_zero(text)
 
     if add_fast_input_on:
         text = add_fast_input(text)
 
-    if bad_codestyle_on:
-        text = bad_codestyle(text)
+    if some_codestyle_changes_on:
+        text = some_codestyle_changes(text)
         text = dotcomma_endl(text)
 
     if remove_not_used_funcs_on and n == 0:
         text = remove_not_used_funcs(text)
 
     # TODO
-    if titov_codestyle_on and n==0 and one_line_program_on!=1:
-        text = titoff(text)
+    if titov_codestyle_on and n == 0 and two_line_program_on != 1:
+        text = titov_codestyle(text)
 
     # IMPORTANT: LEAVE THAT LAST-2
 
@@ -769,18 +743,17 @@ def get_cleaned_text(text, n):
         text = random_endl(text)
 
         # LEAVE THAT LAST
-    if one_line_program_on:
+    if two_line_program_on and oneline_time:
         text = one_line_program(text)
     elif n == 0:
         text = text.replace("\n}\n", "\n}\n\n")
         text = text.replace("\n};\n", "\n};\n\n")
-        text = text.replace(",",", ")
+        text = text.replace(",", ", ")
 
     text = text.replace(")", ") ")
     text = text.replace(") )", "))")
     text = text.replace("    ;", "     ;")
     text = text.replace(" ;", ";")
-
     return text
 
 
@@ -789,9 +762,9 @@ def go_skat(text):
     text = get_cleaned_text(text, 0)
     i = 1
     while text1 != text and i != 100:
-        i += 1
+        i += 2
         text1 = text
         text = get_cleaned_text(text, i)  # TODO?        
     else:
-        text = get_cleaned_text(text, 0)
+        text = get_cleaned_text(text, 1)
     return text
