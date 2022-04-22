@@ -2,7 +2,8 @@ import re
 import random
 
 # =====system_settings============================
-types = ["#define", "wchar_t", "vector<vector<int>>", "vector<int>", "vector<long long>", "vector<char>",
+types = ["operator", "#define", "uint64_t", "uint32_t", "wchar_t", "vector<vector<int>>", "vector<int>",
+         "vector<long long>", "vector<char>",
          "vector<bool>",
          "vector<long>", "unsigned char", "signed char", "unsigned int", "char", "signed int", "short int",
          "unsigned short", "signed short", "unsigned long long", "long long",
@@ -27,14 +28,14 @@ zero_in_fast_input_on = 1  # cout.tie(Null); to cout.tie(0); etc
 remove_comments_on = 1
 delete_empty_lines_on = 1  # Remove empty lines. HIGHLY RECOMMENDED coz some functions leaves empty lines
 random_endlines_on = 1
+typedef_to_define_on = 1  # typedef to define
 clear_defines_on = 1  # clear #DEFINES from the code
-replace_libs_to_bitsstd_on = 1  # replace all libraries to BITS/STDC++.H
+replace_libs_to_bitsstd_on = 1  # replace all libraries to BITS/STDC++.H add using namespace std; remove std::'s
 return0_check_on = 1  # add return 0; if there aren't
 add_fast_input_on = 1  # add fast input if there aren't
 const_to_define_on = 0  # replace const by define
 #   OR
 const_to_code_on = 1  # const into code
-print_endline_after_semicolon_on = 1
 comma_to_full_on = 1  # long long i,c -> long long i long long c
 remove_not_used_funcs_on = 1  # remove useless vars and funcs from code
 exponent_to_decimal_on = 1  # replace 1e6 to 1000000, 1e7 to 10000000 etc
@@ -49,17 +50,23 @@ name_exceptions = []
 # ==TROLLING:
 titov_codestyle_on = 0  # not working with one-liner function. add comments after } like "for i {          } //for"
 two_line_program_on = 0  # turns program into 2-liner
+
+crazy_two_liner_on = 1  # 2D hide and seek #TODO
+# ==OTHER:
+debug_on = 0
+
+
 # ================================================
 
-
-# TODO:
-# typedef to define
-# proverka na solve()
-# norm proverka peremennyh - ?
+# TODO: CRAZY 2 LINER
+# Fix problem from fixit.txt
+# idea: proverka na solve()
+# norm proverka peremennyh
 # norm proverka funciy - vizov iz samoy sebya ili izvne?
-# 2D TABS and \ns TROLLING
-# define-CODED CODE?
-# svoya funcia replace kotoraya ne replacit v "stringah"
+# idea: 2D TABS and \ns TROLLING
+# idea: define- CODED CODE?
+# ??? WORKING TOOOOO LONG. how to fix? svoya funcia replace kotoraya ne replacit v "stringah"
+# mozhno spalitsya: return-1000;
 
 # ==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
@@ -130,13 +137,7 @@ def commentRemover(text):
 
 
 # ==========CLEAR DEFINES FUNCTIONS
-def clear_spaces_after_comma(text):
-    return text.replace(", ", ",")
-
-
 def clever_split(line):
-    # line=clear_spaces_after_comma(line)
-    line = line.replace(" (", "(")
     line = line.split()
     for i in range(3, len(line)):
         line[2] += " " + line[3]
@@ -149,6 +150,8 @@ def clear_defines(text):
         line = text.split('\n')[line]
         if "#define" in line:
             splited_line = clever_split(line)
+            if debug_on:
+                print("input define: ", splited_line, line)
             if "(" in splited_line[1] and ")" in splited_line[1] and "()" not in splited_line[1]:
                 continue
             text = text.replace(line, "")
@@ -168,7 +171,12 @@ def replace_libs_to_bitsstd(text):
         if "#include" in line:
             text = text.replace("\n" + line, "")
             text = text.replace(line, "")  # can be 1st line
-    text = "#include <bits/stdc++.h>\n" + text
+    text = text.replace("std::", "")
+    if "using namespace std;" in clear_spaces(text):
+        text = "#include <bits/stdc++.h>\n" + text
+    else:
+        text = "#include <bits/stdc++.h>\nusing namespace std;\n" + text
+
     return text
 
 
@@ -179,7 +187,6 @@ def replace_libs_to_bitsstd(text):
 
 def delete_empty_lines(text):
     text = "".join([s for s in text.strip().splitlines(True) if s.strip()])
-    # text = text.replace("\n}", "\n}\n") TODO
     return text
 
 
@@ -230,7 +237,7 @@ def delete_multiple_spaces(text):
     return re.sub(' +', ' ', text)
 
 
-def one_line_program(text):
+def two_line_program(text):
     text = text.split("\n")
     text_l = text
     text = ""
@@ -242,6 +249,16 @@ def one_line_program(text):
 
     text = delete_multiple_spaces(text)
     text = text.replace("\n ", "\n")
+    return text
+
+
+def crazy_two_liner(text):  # TODO
+    #    estimated_string_size=crazy_two_liner_max_text_len-len(text)
+    #    crazy_two_liner_tabs_before = random.randint(80,2)
+    #    #random_integer=0
+    #    if len(text)+text.count("\n")*crazy_two_liner_tabs_before < crazy_two_liner_max_text_len:
+    #        text = text.replace("\n", "\n\t" * crazy_two_liner_tabs_before)
+    #    #random_integer=random.randint(1,2)
     return text
 
 
@@ -304,6 +321,16 @@ def const_to_define(text):
 
 
 # ==========
+def replace_not_in_define(string_before, string_after):  # not in define and using
+    text = text.split("\n")
+    for i in range(0, len(text)):
+        if "#define" not in text[i] and "using" not in text[i] and "#include" not in text[i]:
+            text[i] = text[i].replace(string_before, string_after)
+    text_l = text
+    text = ""
+    for i in text_l:
+        text += i + "\n"
+    return text
 
 
 # ==========REMOVE UNUSED VARS AND FUNCS AND change_var_names
@@ -311,6 +338,7 @@ def remove_not_used_funcs(text):
     text = text.replace("(", " ( ")
     text = text.replace(")", " ) ")
     text = text.replace(",", " , ")
+    text = text.replace("&", " & ")
     text = text.replace("&", " & ")
     text = text.replace("\n  ", "\n        ")
     text = text.replace("\n    ", "\n ")
@@ -438,22 +466,8 @@ def change_var_names(text, var):
     random_name = generate_random_name(text)
     for i in syntax_symbols:
         for j in syntax_symbols:
-            text = text.replace(i + var + j, i + random_name + j)
-    return text
-
-
-# ==========
-
-# ==========; -> ;\n
-def print_endline_after_semicolon(text):
-    text = text.split("\n")
-    for i in range(1, len(text)):
-        if "define" not in text[i] and "for" not in text[i]:
-            text[i] = text[i].replace(";", ";\n    ")
-    text_l = text
-    text = ""
-    for i in text_l:
-        text += i + "\n"
+            if i + var + j != ".h>":
+                text = text.replace(i + var + j, i + random_name + j)
     return text
 
 
@@ -501,15 +515,8 @@ def random_endl(text):
 
 # ==========
 def text_space_before_bracket(text):
-    text = text.split("\n")
-    for i in range(0, len(text)):
-        if "define" not in text[i]:
-            text[i] = text[i].replace(" (", "(")
-            text[i] = text[i].replace("(", " (")
-    text_l = text
-    text = ""
-    for i in text_l:
-        text += i + "\n"
+    text = text.replace(" (", "(")
+    text = text.replace("(", " (")
     return text
 
 
@@ -538,13 +545,24 @@ def using_to_define(text):
 
 # ==========syntax letters numbers
 def clear_spaces(text):
+    text = text.split("\n")
+    for i in range(0, len(text)):
+        if "#define" not in text[i]:
+            text[i] = clear_spaces_in_string("\n" + text[i] + "\n")[1:-1]
+    text_l = text
+    text = ""
+    for i in text_l:
+        text += i + "\n"
+    return text
+
+
+def clear_spaces_in_string(text):
     i = 1
     open_bracket_counter = 0
     while i < len(text) - 1:  # -1!
-
         if text[i] in "\"\'" and open_bracket_counter == 0:
             open_bracket_counter += 1
-        elif text[i] in "\"\'" and open_bracket_counter == 1:  # kostyl
+        elif text[i] in "\"\'" and open_bracket_counter == 1:
             open_bracket_counter -= 1
         elif text[i] == " " and open_bracket_counter == 0:
             if text[i - 1].isalnum():
@@ -653,20 +671,31 @@ def titov_codestyle(text):
     return output_code
 
 
+def typedef_to_define(text):
+    text = text.split("\n")
+    for i in range(1, len(text)):
+        if len(text[i].split()) > 0:
+            if "typedef" in text[i].split()[0] and len(text[i].split()) > 2:
+                text[i] = "#define " + text[i].split()[-1].replace(";", "") + " " + " ".join(
+                    text[i].split()[1:len(text[i].split()) - 1])
+    text_l = text
+    text = ""
+    for i in text_l:
+        text += i + "\n"
+    return text
+
+
 def get_cleaned_text(text, n):
     oneline_time = 0
     if n == 1:
         oneline_time = 1
         n = 0
 
-    # LEAVE #1
     if remove_comments_on:
         text = commentRemover(text)
 
     if 1:
-        # experimental part that theoretically can help avoid some errors
-        text = text.replace("typedef long long ll;", "#define ll long long")  # TODO?
-        text = text.replace("typedef long double ld;", "#define ld long double")
+        # experimental part that theoretically can help avoid some errors)
         text = text.replace(", ", ",")
         text = text.replace(",", ", ")
         text = text.replace("> ", ">")
@@ -675,9 +704,6 @@ def get_cleaned_text(text, n):
 
     if clear_spaces_on:
         text = clear_spaces(text)
-
-    if print_endline_after_semicolon_on:
-        text = print_endline_after_semicolon(text)
 
     if zero_in_fast_input_on:
         text = zero_in_fast_input(text)
@@ -690,7 +716,8 @@ def get_cleaned_text(text, n):
 
     if exponent_to_decimal_on:
         text = exponent_to_decimal(text)
-
+    if typedef_to_define_on:
+        text = typedef_to_define(text)
     if clear_defines_on:
         text = clear_defines(text)
 
@@ -726,11 +753,8 @@ def get_cleaned_text(text, n):
     if remove_not_used_funcs_on and n == 0:
         text = remove_not_used_funcs(text)
 
-    # TODO
     if titov_codestyle_on and n == 0 and two_line_program_on != 1:
         text = titov_codestyle(text)
-
-    # IMPORTANT: LEAVE THAT LAST-2
 
     if delete_empty_lines_on:
         text = delete_empty_lines(text)
@@ -738,13 +762,13 @@ def get_cleaned_text(text, n):
     if clear_spaces_on:
         text = clear_spaces(text)
 
-    # IMPORTANT: LEAVE THAT LAST-1
     if random_endlines_on and n == 0:
         text = random_endl(text)
 
-        # LEAVE THAT LAST
     if two_line_program_on and oneline_time:
-        text = one_line_program(text)
+        text = two_line_program(text)
+        if crazy_two_liner_on:
+            text = crazy_two_liner(text)
     elif n == 0:
         text = text.replace("\n}\n", "\n}\n\n")
         text = text.replace("\n};\n", "\n};\n\n")
@@ -754,6 +778,12 @@ def get_cleaned_text(text, n):
     text = text.replace(") )", "))")
     text = text.replace("    ;", "     ;")
     text = text.replace(" ;", ";")
+    text = text.replace("< =", "<=")
+    text = text.replace("> =", ">=")
+
+    if debug_on:
+        print("debug out: ", text)
+
     return text
 
 
@@ -764,7 +794,8 @@ def go_skat(text):
     while text1 != text and i != 100:
         i += 2
         text1 = text
-        text = get_cleaned_text(text, i)  # TODO?        
+        text = get_cleaned_text(text, i)
     else:
+        text = get_cleaned_text(text, 1)
         text = get_cleaned_text(text, 1)
     return text
