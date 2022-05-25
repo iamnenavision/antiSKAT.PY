@@ -5,6 +5,7 @@ from mail import send_message
 import time
 import os
 
+
 KEY_TG = os.environ.get('KEY_TG')
 bot = Bot(token=KEY_TG)
 dp = Dispatcher(bot)
@@ -18,7 +19,7 @@ async def start(message: types.Message):
         last_name = message.from_user.last_name
         insert_user_db(_id, first_name, last_name)
         text_for_email = f"{first_name} {last_name} logged"
-        send_message(text_for_email)
+        await send_message(text_for_email)
     text = """Здравствуйте, я так называемый Максим Инютин.\n\nДнём я обычный клоун, но ночью во мне просыпается настоящий python-программист. Тиран, гроссмейстер олимпроги пришёл, чтобы помочь начинающим падаванам Валентина Евгеньевича уничтожить дорешку и получить заветные баллы.\n\nОтправь боту код, полученный от твоего умного друга, и получи оплеуху -- решение, которое можно без малейшего мозгошевеления заслать на проверку."""
     await message.answer(text)
 
@@ -27,7 +28,7 @@ async def start(message: types.Message):
 async def go_sсat(message: types.Message):
     text = go_skat(message.text)
     text_for_email = f"Дружище {message.from_user.first_name} {message.from_user.last_name} скатывает задачу:\n\n{text}"
-    send_message(text_for_email)
+    await send_message(text_for_email)
     await message.answer(text)
 
 

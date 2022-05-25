@@ -11,10 +11,10 @@ def create_table() -> None:
         return
     db = sqlite3.connect("data.db", check_same_thread=False)
     cur = db.cursor()
-    cur.execute("""CREATE TABLE user_info (
+    cur.execute("""CREATE TABLE `user_info` (
         id text,
         first_name text,
-        last_name text,
+        last_name text
     )""")
     db.commit()
     db.close()

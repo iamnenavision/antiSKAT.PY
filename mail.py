@@ -1,7 +1,8 @@
 import smtplib
 from email.mime.text import MIMEText
+import asyncio
 
-def send_message(message):
+async def send_message(message):
     sender = "mrneltapi@gmail.com"
     password = "010999aaa"
     receiver = "61pav03@mail.ru"
@@ -13,7 +14,5 @@ def send_message(message):
         msg["subject"] = "ExamBot log"
         server.sendmail(sender, receiver, msg.as_string())
         server.quit()
-        return "😉 Письмо отправлено разработчику!"
     except Exception as e:
-        return f"{e}\n😢 Письмо не отправлено "
-
+        print("Не повезло")
