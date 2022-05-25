@@ -45,13 +45,13 @@ using_to_define_on = 1
 change_var_names_on = 1  # change_var_names on random
 generate_only_not_vowels_on = 0
 generate_first_letter_uppercase_on = 0
-random_name_length = [1, 5]
-name_exceptions = []
+random_name_length = [1, 4]
+name_exceptions = ["main", "join", "size", "back"]  # will not generate and will not be replaced
 # ==TROLLING:
 titov_codestyle_on = 0  # not working with one-liner function. add comments after } like "for i {          } //for"
 two_line_program_on = 0  # turns program into 2-liner
 
-crazy_two_liner_on = 1  # 2D hide and seek #TODO
+crazy_two_liner_on = 0  # 2D hide and seek #TODO
 # ==OTHER:
 debug_on = 0
 
@@ -321,16 +321,16 @@ def const_to_define(text):
 
 
 # ==========
-def replace_not_in_define(string_before, string_after):  # not in define and using
-    text = text.split("\n")
-    for i in range(0, len(text)):
-        if "#define" not in text[i] and "using" not in text[i] and "#include" not in text[i]:
-            text[i] = text[i].replace(string_before, string_after)
-    text_l = text
-    text = ""
-    for i in text_l:
-        text += i + "\n"
-    return text
+# def replace_not_in_define(string_before, string_after):  # not in define and using
+#    text = text.split("\n")
+#    for i in range(0, len(text)):
+#        if "#define" not in text[i] and "using" not in text[i] and "#include" not in text[i]:
+#            text[i] = text[i].replace(string_before, string_after)
+#    text_l = text
+#    text = ""
+#    for i in text_l:
+#        text += i + "\n"
+#    return text
 
 
 # ==========REMOVE UNUSED VARS AND FUNCS AND change_var_names
@@ -392,7 +392,11 @@ def clear_var_name(var):
 
 
 def check_vars_and_funcs(text, var, line_to_replace, flag):  # flag 1 can del, flag 0 only rename
-    if text.find(var) == text.rfind(var) and var != "main" and not "main" not in line_to_replace and flag == 1:
+    if var in name_exceptions:
+        return text
+    if debug_on:
+        print(var, " found in line ", line_to_replace, " . checking before deleting... ")
+    if text.find(var) == text.rfind(var) and flag == 1:
         if var + "(" in line_to_replace.replace(" ", ""):
             text = delete_function(text, line_to_replace)
         else:
@@ -461,6 +465,8 @@ def generate_random_name(text):
 
 
 def change_var_names(text, var):
+    if debug_on:
+        print(var, "'s name changed")
     if "main" in var:
         return text
     random_name = generate_random_name(text)
@@ -479,9 +485,24 @@ def comma_to_full(text):
     for i in range(1, len(text)):
         if "," in text[i] and "(" not in text[i] and "{" not in text[i] and "[" not in text[i] and "<" not in text[i]:
             for j in types:  # TODO kostyl
-                if j in text[i].split()[0]:
-                    text[i] = text[i].replace(", ", "; \n    " + j + " ")
-                    text[i] = text[i].replace(",", "; \n    " + j + " ")
+                # print(text[i],j,len(text[i].split()), j in text[i].split()[0]+text[i].split()[1])
+                if len(text[i].split()) > 2:
+                    if j in text[i].split()[0] or j in text[i].split()[0] + " " + text[i].split()[1] or j in \
+                            text[i].split()[0] + " " + text[i].split()[1] + text[i].split()[2]:
+                        text[i] = text[i].replace(", ", "; \n    " + j + " ")
+                        text[i] = text[i].replace(",", "; \n    " + j + " ")
+                        break
+                elif len(text[i].split()) > 1:
+                    if j in text[i].split()[0] or j in text[i].split()[0] + " " + text[i].split()[1]:
+                        text[i] = text[i].replace(", ", "; \n    " + j + " ")
+                        text[i] = text[i].replace(",", "; \n    " + j + " ")
+                        break
+                elif len(text[i].split()) > 0:
+                    if j in text[i].split()[0]:
+                        text[i] = text[i].replace(", ", "; \n    " + j + " ")
+                        text[i] = text[i].replace(",", "; \n    " + j + " ")
+                        break
+
     text_l = text
     text = ""
     for i in text_l:
@@ -686,11 +707,6 @@ def typedef_to_define(text):
 
 
 def get_cleaned_text(text, n):
-    oneline_time = 0
-    if n == 1:
-        oneline_time = 1
-        n = 0
-
     if remove_comments_on:
         text = commentRemover(text)
 
@@ -750,10 +766,10 @@ def get_cleaned_text(text, n):
         text = some_codestyle_changes(text)
         text = dotcomma_endl(text)
 
-    if remove_not_used_funcs_on and n == 0:
+    if remove_not_used_funcs_on and (n == 1 or n == 2):
         text = remove_not_used_funcs(text)
 
-    if titov_codestyle_on and n == 0 and two_line_program_on != 1:
+    if titov_codestyle_on and (n == 1 or n == 2) and two_line_program_on != 1:
         text = titov_codestyle(text)
 
     if delete_empty_lines_on:
@@ -762,10 +778,10 @@ def get_cleaned_text(text, n):
     if clear_spaces_on:
         text = clear_spaces(text)
 
-    if random_endlines_on and n == 0:
+    if random_endlines_on and n == 1 or n == 2:
         text = random_endl(text)
 
-    if two_line_program_on and oneline_time:
+    if two_line_program_on and n == 2:
         text = two_line_program(text)
         if crazy_two_liner_on:
             text = crazy_two_liner(text)
@@ -792,10 +808,10 @@ def go_skat(text):
     text = get_cleaned_text(text, 0)
     i = 1
     while text1 != text and i != 100:
-        i += 2
+        i += 1
         text1 = text
         text = get_cleaned_text(text, i)
     else:
         text = get_cleaned_text(text, 1)
-        text = get_cleaned_text(text, 1)
+        text = get_cleaned_text(text, 2)
     return text
