@@ -55,19 +55,6 @@ crazy_two_liner_on = 0  # 2D hide and seek #TODO
 # ==OTHER:
 debug_on = 0
 
-
-# ================================================
-
-# TODO: CRAZY 2 LINER
-# Fix problem from fixit.txt
-# idea: proverka na solve()
-# norm proverka peremennyh
-# norm proverka funciy - vizov iz samoy sebya ili izvne?
-# idea: 2D TABS and \ns TROLLING
-# idea: define- CODED CODE?
-# ??? WORKING TOOOOO LONG. how to fix? svoya funcia replace kotoraya ne replacit v "stringah"
-# mozhno spalitsya: return-1000;
-
 # ==========COMMENT REMOVER FUNCTIONS
 def removeComments(text):
     """ remove c-style comments.
